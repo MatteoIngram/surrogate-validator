@@ -1,0 +1,132 @@
+# Surrogate data test for return series
+
+A static web page that tests whether a financial return series, or a trading strategy's returns, contains structure that noise with the same distribution and linear autocorrelation would not produce.
+
+All computation runs in the browser with [Pyodide](https://pyodide.org). There is no backend and the data is never uploaded.
+
+## Files
+
+| File | Purpose |
+|---|---|
+| `index.html` | The page. HTML, CSS and JS inline; Python runs in a Web Worker. |
+| `validate.py` | The validation library. Fetched by the page at run time; also runs natively. |
+| `sample_data.csv` | 1,500 business days of synthetic GARCH(1,1) returns with a 20-day momentum position. Used by "Try with sample data" and offered for download as `example_strategy.csv`. |
+| `sample_series.csv` | The same returns without the position column, offered for download as `example_series.csv`. |
+| `tests/test_validate.py` | Native pytest suite. |
+
+## Input
+
+CSV with columns `date`, `return`, and `position` for the strategy test. Requirements:
+- at least 500 rows, oldest first, with no missing values;
+- no date gaps longer than ten typical intervals.
+
+Series longer than 5,000 rows are truncated to the most recent 5,000, with a warning.
+
+## Method
+
+**Series test.** Four tests, each against 199 IAAFT surrogates:
+
+| Test | Statistic |
+|---|---|
+| BDS, raw returns | mean BDS statistic over m = 2..5, ε = 1.5σ |
+| BDS, GARCH(1,1) standardised residuals | as above |
+| Lyapunov, raw returns | Rosenstein largest exponent |
+| Lyapunov, GARCH residuals | as above |
+
+Each test reports a two-sided rank p-value. The overall verdict applies a Holm correction across the four.
+
+**Strategy test.** The annualised Sharpe ratio of `position × return` is compared with two nulls:
+- the same positions applied to IAAFT surrogates of the returns;
+- the positions permuted in time.
+
+The test also reports the deflated Sharpe ratio (Bailey & López de Prado, 2014) for a user-supplied number of strategy variants tried.
+
+### Relation to the dissertation pipeline
+
+`validate.py` is refactored from the dissertation code: `BDS.py`, `surrogatedata.py` and `CODE/LS.py`. The following are kept:
+- IAAFT, at 100 iterations with a rank-convergence stop;
+- GARCH(1,1) with constant mean and Student-t innovations;
+- BDS with ε = 1.5σ;
+- τ from the first minimum of average mutual information (64 bins);
+- m from false nearest neighbours (R_tol = 15, A_tol = 2, 1% threshold);
+- the Rosenstein exponent via `nolds.lyap_r`, with Theiler window 20 and fit length 10;
+- the rank p-value (1 + #)/(1 + N).
+
+Deliberate changes:
+
+1. **GARCH without `arch`.** `arch` is not available in Pyodide, so GARCH is estimated by maximum likelihood with `scipy.optimize` (SLSQP). On the S&P 500 series used in the dissertation, the estimates match `arch` to four decimals (α = 0.1025, β = 0.8922, ν = 6.10). The standardised residuals correlate with `arch`'s at 0.9999996.
+2. **BDS reimplemented.** `statsmodels.tsa.stattools.bds` loads in Pyodide but gives wrong answers there. It sums indicator counts in the platform integer, which is int32 under WebAssembly, and its variance term overflows above about 1,400 observations. On the sample data the browser returned BDS ≈ 0.3–0.8 instead of 8–13. `validate.py` ports the same algorithm with 64-bit counts; natively it reproduces statsmodels exactly (tested) and runs about 7× faster.
+3. **Lyapunov fit.** The line fit uses `fit="poly"` (least squares) rather than nolds' default RANSAC, which needs scikit-learn and is not deterministic.
+4. **Two-sided Lyapunov test.** The dissertation used a one-sided test, on the hypothesis that chaos gives a *larger* exponent than the linear null. On the Lorenz positive control the opposite holds. The observed exponent (0.042 per sample) lies *below* every IAAFT surrogate (about 0.15). True neighbours on an attractor separate more slowly than the spurious neighbours of matched linear noise. A one-sided upper test returns p = 1.0 on Lorenz, so it cannot detect chaos. The test here is two-sided, using distances from the pooled median, which keeps the minimum p at 1/(N+1). The same applies to the raw S&P 500 result in `surrogatedata.py`: an exponent below the surrogates would have been read as "no evidence" under the one-sided test.
+
+## Validation results
+
+Measured with `python -m pytest tests -s` (199 surrogates, seeded).
+
+| Process | Runs | Result |
+|---|---|---|
+| Gaussian white noise, n = 500 | 50 | Overall false-positive rate (Holm, 5%): **2%**. Per test: BDS raw 4%, BDS residuals 2%, Lyapunov raw 4%, Lyapunov residuals 6%. |
+| GARCH(1,1), ω = 0.05, α = 0.10, β = 0.85, n = 1,000 | 20 | Raw BDS rejects in **100%**. Residual BDS rejects in **0%**. |
+| Lorenz x-component, dt = 0.02, n = 1,000 | 1 | λ = +0.042 per sample. All four tests reject with p = 0.005, the minimum possible. |
+
+The per-test false-positive rates are all within sampling error of the nominal 5%. With 50 runs, a 95% interval around 5% is roughly 0–11%.
+
+The Lorenz exponent per time unit (2.1) overstates the true value (0.906): the series is short and m = 3 is chosen automatically. The test requires only a positive exponent and a rejection.
+
+Additional tests cover:
+- IAAFT preserving the amplitude distribution and spectrum;
+- recovery of GARCH parameters;
+- BDS agreeing with statsmodels;
+- Holm adjustment;
+- the deflated Sharpe ratio reducing to the probabilistic Sharpe ratio for one trial;
+- strategy power and size;
+- input validation;
+- truncation at 5,000 observations.
+
+## Running locally
+
+```bash
+pip install numpy scipy pandas nolds pytest statsmodels   # statsmodels only for the cross-check test
+python -m pytest tests -s
+python -m http.server 8000                                  # then open http://localhost:8000
+```
+
+The page must be served over HTTP. Opened as a `file://` URL, the browser blocks the worker's fetch of `validate.py` and `sample_data.csv`.
+
+## Runtime
+
+For 1,500 observations and 199 surrogates:
+
+| Mode | Desktop Chrome | Native |
+|---|---|---|
+| Series test | about 70 s | about 25 s |
+| Strategy test | a few seconds | a few seconds |
+
+Cost grows roughly as n^1.7, so 5,000 observations take about 10 minutes in the browser. The first visit also downloads about 30 MB from the Pyodide CDN (cached afterwards).
+
+Statistics are identical natively and in the browser. Surrogate p-values can differ by a rank or two, because floating-point differences in the FFT shift individual IAAFT surrogates.
+
+## Sample data
+
+`sample_data.csv` was generated with seed 20240101:
+- **Returns:** GARCH(1,1) with ω = 2e-6, α = 0.08, β = 0.90 and Student-t(6) innovations scaled to unit variance, plus a constant mean of 3e-4.
+- **Position:** the sign of the previous 20 days' summed return.
+
+The returns have no predictable mean, so the strategy test should not reject. The series test should reject on raw BDS but not on the residuals.
+
+## Dependencies
+
+- In the browser: Pyodide 0.27.7 (numpy, scipy, pandas), plus nolds installed from PyPI with micropip.
+- Fonts: Source Serif 4, IBM Plex Sans and IBM Plex Mono, from Google Fonts.
+- No chart or UI libraries.
+
+## References
+
+- Bailey, D. H. & López de Prado, M. (2014). The deflated Sharpe ratio. *Journal of Portfolio Management*, 40(5), 94–107.
+- Brock, W. A., Dechert, W. D., Scheinkman, J. A. & LeBaron, B. (1996). A test for independence based on the correlation dimension. *Econometric Reviews*, 15(3), 197–235.
+- Kennel, M. B., Brown, R. & Abarbanel, H. D. I. (1992). Determining embedding dimension for phase-space reconstruction. *Physical Review A*, 45, 3403–3411.
+- Rosenstein, M. T., Collins, J. J. & De Luca, C. J. (1993). A practical method for calculating largest Lyapunov exponents from small data sets. *Physica D*, 65, 117–134.
+- Schreiber, T. & Schmitz, A. (1996). Improved surrogate data for nonlinearity tests. *Physical Review Letters*, 77(4), 635–638.
+- Theiler, J., Eubank, S., Longtin, A., Galdrikian, B. & Farmer, J. D. (1992). Testing for nonlinearity in time series: the method of surrogate data. *Physica D*, 58, 77–94.
+
+Statistical diagnostics only. Not investment advice.

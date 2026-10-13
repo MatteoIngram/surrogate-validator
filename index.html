@@ -1,0 +1,938 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Surrogate data test</title>
+<meta name="description" content="Tests whether a return series or a strategy's returns contain structure that noise with the same distribution and autocorrelation would not produce. Runs entirely in the browser.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #fafaf8;
+  --fg: #1b1b1a;
+  --muted: #5f615f;
+  --faint: #8a8c88;
+  --rule: #d8d8d2;
+  --rule-strong: #1b1b1a;
+  --accent: #1f3a5f;
+  --accent-ink: #fafaf8;
+  --bar: #b4b8bd;
+  --band: #e3e4e0;
+  --err: #8a1c1c;
+  --serif: "Source Serif 4", "Source Serif Pro", Georgia, "Times New Roman", serif;
+  --sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141414;
+    --fg: #e6e4df;
+    --muted: #a3a39d;
+    --faint: #7d7d78;
+    --rule: #34342f;
+    --rule-strong: #e6e4df;
+    --accent: #93b2d8;
+    --accent-ink: #141414;
+    --bar: #5b6067;
+    --band: #2a2c2e;
+    --err: #e3958c;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 15px/1.6 var(--sans);
+}
+main { max-width: 760px; margin: 0 auto; padding: 48px 16px 64px; }
+h1, h2, h3 { font-family: var(--serif); font-weight: 600; line-height: 1.25; margin: 0; }
+h1 { font-size: 30px; letter-spacing: -0.01em; }
+h2 { font-size: 21px; margin: 0 0 14px; }
+h3 { font-size: 17px; margin: 28px 0 6px; }
+p { margin: 0 0 12px; }
+a { color: var(--accent); text-underline-offset: 2px; }
+section { border-top: 1px solid var(--rule); padding-top: 26px; margin-top: 34px; }
+.lede { font-family: var(--serif); font-size: 18px; line-height: 1.5; margin: 12px 0 10px; }
+.meta, .note { color: var(--muted); font-size: 13.5px; }
+.num, code, .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 0.93em; }
+.privacy { border-left: 2px solid var(--accent); padding: 2px 0 2px 12px; margin-top: 18px; font-size: 14px; }
+
+/* controls */
+.row { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; margin: 12px 0; }
+label { font-size: 14px; }
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field span { font-size: 13px; color: var(--muted); }
+input[type=number], input[type=text] {
+  font: 14px var(--mono); color: var(--fg); background: var(--bg);
+  border: 1px solid var(--rule); border-radius: 2px; padding: 6px 8px; width: 120px;
+}
+input[type=file] { font: 14px var(--sans); color: var(--fg); max-width: 100%; }
+input:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button {
+  font: 500 14px var(--sans); color: var(--fg); background: transparent;
+  border: 1px solid var(--rule-strong); border-radius: 2px; padding: 7px 14px; cursor: pointer;
+}
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+button:disabled { opacity: 0.45; cursor: default; }
+fieldset { border: 0; padding: 0; margin: 0; }
+legend { font-size: 13px; color: var(--muted); padding: 0; margin-bottom: 6px; }
+.seg { display: inline-flex; border: 1px solid var(--rule-strong); border-radius: 2px; }
+.seg label { padding: 6px 14px; cursor: pointer; }
+.seg label + label { border-left: 1px solid var(--rule-strong); }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg label:has(input:checked) { background: var(--fg); color: var(--bg); }
+.seg label:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+details { margin: 16px 0 4px; }
+summary { cursor: pointer; font-size: 14px; color: var(--muted); }
+details .row { margin-top: 12px; }
+.filename { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+
+/* status */
+#status { margin-top: 18px; min-height: 22px; }
+#messages { margin-top: 10px; }
+.progress { height: 2px; background: var(--rule); margin: 8px 0 6px; }
+.progress > div { height: 2px; background: var(--accent); width: 0; transition: width 0.2s linear; }
+.stages { list-style: none; padding: 0; margin: 0; font-size: 13.5px; }
+.stages li { color: var(--faint); font-family: var(--mono); font-size: 12.5px; }
+.stages li.active { color: var(--fg); }
+.stages li.done { color: var(--muted); }
+.stages li::before { content: "\2003"; display: inline-block; width: 1.4em; }
+.stages li.done::before { content: "\2713"; }
+.stages li.active::before { content: "\2192"; }
+.errors { color: var(--err); font-size: 14px; }
+.errors ul { margin: 6px 0 0; padding-left: 18px; }
+.warn { color: var(--muted); font-size: 13.5px; }
+
+/* results */
+.verdict { font-family: var(--serif); font-size: 17px; line-height: 1.5; }
+.overall { border-top: 2px solid var(--rule-strong); border-bottom: 1px solid var(--rule); padding: 12px 0; margin: 8px 0 18px; }
+.tag { font: 600 11px/1 var(--sans); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 10px 0 6px; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th, td { padding: 6px 10px 6px 0; text-align: left; vertical-align: top; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+thead th { font-weight: 500; color: var(--muted); border-bottom: 1px solid var(--rule-strong); font-size: 12.5px; }
+td.r, th.r { text-align: right; padding-right: 0; padding-left: 14px; }
+td.r { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 13px; }
+.test { margin-top: 30px; }
+.test .verdict { font-size: 15.5px; }
+figure { margin: 12px 0 0; }
+figcaption { font-size: 12.5px; color: var(--muted); margin-top: 4px; }
+.chart { width: 100%; }
+.chart svg { display: block; overflow: visible; }
+.legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); margin-bottom: 4px; }
+.sw { display: inline-block; width: 14px; height: 2px; vertical-align: middle; margin-right: 6px; }
+.sw.band { height: 8px; }
+svg text { font-family: var(--mono); font-size: 11px; fill: var(--muted); }
+svg .obs-label { fill: var(--fg); }
+#tip {
+  position: fixed; pointer-events: none; z-index: 10; display: none;
+  background: var(--bg); color: var(--fg); border: 1px solid var(--rule-strong); border-radius: 2px;
+  padding: 4px 8px; font: 12px/1.4 var(--mono); white-space: nowrap;
+}
+.actions { margin-top: 28px; }
+
+/* prose */
+.prose p, .prose li { font-family: var(--serif); font-size: 16.5px; line-height: 1.65; }
+.prose h3 { margin-top: 22px; }
+.prose ol, .prose ul { padding-left: 20px; margin: 0 0 12px; }
+.refs { font-size: 14px; padding-left: 0; list-style: none; }
+.refs li { font-family: var(--serif); font-size: 14.5px; line-height: 1.5; margin-bottom: 6px; padding-left: 1.4em; text-indent: -1.4em; }
+footer { border-top: 1px solid var(--rule); margin-top: 40px; padding-top: 14px; font-size: 13px; color: var(--muted); }
+[hidden] { display: none !important; }
+
+@media (max-width: 520px) {
+  main { padding-top: 28px; }
+  h1 { font-size: 25px; }
+  .lede { font-size: 16.5px; }
+  .prose p, .prose li { font-size: 16px; }
+}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Surrogate data test for return series</h1>
+    <p class="lede">Tests whether a return series, or a strategy's returns, contains structure that noise with the same distribution and autocorrelation would not produce.</p>
+    <p class="meta">BDS, Lyapunov and Sharpe ratio statistics compared against IAAFT surrogates. <a href="#about">Method and limits</a>.</p>
+    <p class="privacy">Your data never leaves your browser. The computation runs locally in Python (Pyodide); the file is read on this page and nothing is uploaded.</p>
+  </header>
+
+  <section id="input" aria-labelledby="h-input">
+    <h2 id="h-input">Data</h2>
+    <p class="note">CSV with columns <code>date</code>, <code>return</code> and, for the strategy test, <code>position</code>. Returns are simple or log returns as decimals, one row per period, oldest first, at least 500 rows. In strategy mode the position on a row is the exposure held over that row's return. <a href="#examples">Download example files</a>.</p>
+
+    <div class="row">
+      <input type="file" id="file" accept=".csv,text/csv" aria-label="CSV file">
+      <button type="button" id="sample">Try with sample data</button>
+    </div>
+    <div class="filename" id="filename" aria-live="polite"></div>
+    <div id="messages" aria-live="polite"></div>
+
+    <fieldset class="row" style="margin-top:18px">
+      <legend>Test</legend>
+      <div class="seg" role="radiogroup">
+        <label><input type="radio" name="mode" value="series" checked> Series test</label>
+        <label><input type="radio" name="mode" value="strategy"> Strategy test</label>
+      </div>
+    </fieldset>
+    <p class="note" id="mode-note"></p>
+
+    <details id="advanced">
+      <summary>Advanced options</summary>
+      <div class="row">
+        <label class="field"><span>Surrogates</span><input type="number" id="opt-n" value="199" min="19" max="999" step="1"></label>
+        <label class="field" data-series><span>Delay τ</span><input type="text" id="opt-tau" placeholder="auto" inputmode="numeric"></label>
+        <label class="field" data-series><span>Embedding m</span><input type="text" id="opt-m" placeholder="auto" inputmode="numeric"></label>
+        <label class="field" data-strategy hidden><span>Variants tried</span><input type="number" id="opt-trials" value="1" min="1" step="1"></label>
+      </div>
+      <p class="note" data-series>Auto: τ is the first minimum of average mutual information, m the first dimension with under 1% false nearest neighbours. 199 surrogates give a smallest p-value of 0.005.</p>
+      <p class="note" data-strategy hidden>Variants tried: how many strategy configurations were tested before this one. The deflated Sharpe ratio raises the bar accordingly.</p>
+    </details>
+
+    <div class="row" style="margin-top:20px">
+      <button type="button" class="primary" id="run" disabled>Run test</button>
+      <span class="note" id="runtime-note"></span>
+    </div>
+
+    <div id="status" aria-live="polite"></div>
+  </section>
+
+  <section id="results" hidden aria-labelledby="h-results">
+    <h2 id="h-results">Results</h2>
+    <div id="results-body"></div>
+    <div class="actions"><button type="button" id="download">Download report</button></div>
+  </section>
+
+  <section id="about" class="prose" aria-labelledby="h-about">
+    <h2 id="h-about">What this tests</h2>
+    <p>Daily returns are not plain noise. Their distribution has fat tails and their autocorrelation is rarely exactly zero, so a comparison with Gaussian noise finds "structure" almost every time and says nothing. This tool asks a narrower question: does the series contain anything that noise with the same distribution and the same linear autocorrelation would not also produce?</p>
+    <p>A surrogate is a synthetic series made by scrambling the data while keeping its histogram and its power spectrum. Think of re-cutting a film: every frame is still there, and the overall pace of cuts is kept, but the plot is gone. Any statistic that comes out the same on the real series and on its surrogates cannot be evidence of a plot.</p>
+    <p>Each statistic is computed on the data and on 199 surrogates. The p-value is the share of surrogates at least as extreme as the data. A p-value of 0.01 means only about 1% of surrogates were as extreme; it is not the probability that the series is random.</p>
+    <p>A rejection means the series has structure beyond its distribution and linear autocorrelation. It does not mean that structure is predictable or tradable. In daily returns it is usually volatility clustering, which is why the tests are repeated on GARCH residuals. Not rejecting means this method found nothing at this sample size. It does not prove the series is random.</p>
+    <p>Limits: results depend on sample length and embedding parameters. Structural breaks and other non-stationarity can produce rejections that are not nonlinearity. The strategy test takes positions as given and cannot see how they were chosen, beyond the number of variants you report.</p>
+
+    <h3>Methodology</h3>
+    <ol>
+      <li>Surrogates are generated by the iterative amplitude-adjusted Fourier transform (IAAFT; Schreiber &amp; Schmitz, 1996), 100 iterations or until the ranks stop changing. Inference follows the surrogate-data framework of Theiler et al. (1992): the p-value is the rank of the observed statistic among the surrogates, with a minimum of 1/(N+1).</li>
+      <li>Volatility is filtered with a constant-mean GARCH(1,1) model with Student-t innovations, estimated by maximum likelihood. Tests are run on the raw returns and on the standardised residuals.</li>
+      <li>The BDS statistic (Brock et al., 1996) is computed for embedding dimensions 2 to 5 with ε = 1.5 standard deviations. The surrogate test uses the mean statistic over dimensions; asymptotic p-values per dimension are reported for reference.</li>
+      <li>The largest Lyapunov exponent is estimated by the method of Rosenstein et al. (1993), with Theiler window 20 and a 10-step fit. The delay τ is the first minimum of average mutual information and m the first dimension with under 1% false nearest neighbours. The test is two-sided: on the Lorenz system the observed exponent lies below the surrogates.</li>
+      <li>Series mode reports an overall verdict after Holm correction across its four tests.</li>
+      <li>Strategy mode compares the annualised Sharpe ratio with two nulls: the same positions on IAAFT surrogates of the returns, and the positions shuffled in time. It also reports the deflated Sharpe ratio (Bailey &amp; López de Prado, 2014), with the cross-trial Sharpe variance estimated from the permutation null.</li>
+    </ol>
+    <p class="note" style="font-family:var(--sans)">Validation on known processes: Gaussian white noise rejects in 2% of 50 runs, simulated GARCH(1,1) data rejects on raw BDS in 20 of 20 runs and on residual BDS in none, and the Lorenz system rejects on all four tests. See the <a href="https://github.com/matteoingram/surrogate-validator#readme">repository README</a> for details.</p>
+
+    <h3>References</h3>
+    <ul class="refs">
+      <li>Bailey, D. H. &amp; López de Prado, M. (2014). The deflated Sharpe ratio: correcting for selection bias, backtest overfitting and non-normality. <i>Journal of Portfolio Management</i>, 40(5), 94–107.</li>
+      <li>Brock, W. A., Dechert, W. D., Scheinkman, J. A. &amp; LeBaron, B. (1996). A test for independence based on the correlation dimension. <i>Econometric Reviews</i>, 15(3), 197–235.</li>
+      <li>Rosenstein, M. T., Collins, J. J. &amp; De Luca, C. J. (1993). A practical method for calculating largest Lyapunov exponents from small data sets. <i>Physica D</i>, 65, 117–134.</li>
+      <li>Schreiber, T. &amp; Schmitz, A. (1996). Improved surrogate data for nonlinearity tests. <i>Physical Review Letters</i>, 77(4), 635–638.</li>
+      <li>Theiler, J., Eubank, S., Longtin, A., Galdrikian, B. &amp; Farmer, J. D. (1992). Testing for nonlinearity in time series: the method of surrogate data. <i>Physica D</i>, 58, 77–94.</li>
+    </ul>
+
+    <h3>Disclaimer</h3>
+    <p>These are statistical diagnostics only. Nothing on this page is investment advice.</p>
+  </section>
+
+  <section id="examples" aria-labelledby="h-examples">
+    <h2 id="h-examples">Example files</h2>
+    <p>Both files hold the same 1,500 business days of synthetic GARCH(1,1) returns. Use them as templates: replace the rows with your own data and keep the header line.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>File</th><th>Use with</th><th>Columns</th><th class="r">Rows</th></tr></thead>
+      <tbody>
+        <tr><td><a href="sample_series.csv" download="example_series.csv">example_series.csv</a></td><td>Series test</td><td><code>date, return</code></td><td class="r">1,500</td></tr>
+        <tr><td><a href="sample_data.csv" download="example_strategy.csv">example_strategy.csv</a></td><td>Strategy test</td><td><code>date, return, position</code></td><td class="r">1,500</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">First rows of the strategy file:</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>date</th><th class="r">return</th><th class="r">position</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">2019-01-02</td><td class="r">-0.00647595</td><td class="r">1</td></tr>
+        <tr><td class="mono">2019-01-03</td><td class="r">0.01034595</td><td class="r">1</td></tr>
+        <tr><td class="mono">2019-01-04</td><td class="r">0.03564101</td><td class="r">1</td></tr>
+      </tbody>
+    </table></div>
+    <ul class="note" style="padding-left:18px;margin:10px 0 0">
+      <li><code>date</code>: one row per period, oldest first. YYYY-MM-DD is safest; M/D/YYYY also works.</li>
+      <li><code>return</code>: a decimal return per period, so 1% is <code>0.01</code>. Prices must be converted to returns first.</li>
+      <li><code>position</code>: the exposure held over that row's return, for example 1 long, 0 flat, −1 short, or fractions. Decide it with data up to the previous row to avoid look-ahead.</li>
+      <li>No empty cells, no repeated dates, at least 500 rows. The first line must be the header.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <span>Matteo Ingram</span> · <a href="https://matteoingram.github.io/Ingram/">Portfolio</a> · <span class="mono" id="version"></span>
+  </footer>
+</main>
+<div id="tip" role="tooltip"></div>
+
+<script id="worker-src" type="text/plain">
+let pyodide = null;
+let runFn = null;
+const post = (m) => self.postMessage(m);
+
+async function init(opts) {
+  try {
+    post({ type: "stage", stage: "python", msg: "fetching the runtime from cdn.jsdelivr.net" });
+    importScripts(opts.pyodideUrl + "pyodide.js");
+    pyodide = await loadPyodide({ indexURL: opts.pyodideUrl });
+
+    post({ type: "stage", stage: "packages", msg: "Installing numpy, scipy, pandas" });
+    await pyodide.loadPackage(["numpy", "scipy", "pandas", "micropip"], {
+      messageCallback: (m) => { if (/^Loading /.test(m)) post({ type: "detail", msg: m }); },
+      errorCallback: (m) => post({ type: "detail", msg: m }),
+    });
+    post({ type: "detail", msg: "Installing nolds from PyPI" });
+    await pyodide.runPythonAsync(`
+import micropip
+try:
+    await micropip.install("nolds")
+except Exception:
+    # nolds lists 'future' as a dependency but does not need it on Python 3
+    await micropip.install("nolds", deps=False)
+`);
+    post({ type: "detail", msg: "Fetching validate.py and importing pandas" });
+    const resp = await fetch(opts.validateUrl, { cache: "no-cache" });
+    if (!resp.ok) throw new Error("could not fetch validate.py (HTTP " + resp.status + ")");
+    pyodide.FS.writeFile("/home/pyodide/validate.py", await resp.text());
+    await pyodide.runPythonAsync(`
+import json, sys
+sys.path.insert(0, "/home/pyodide")
+import pandas as pd
+import validate
+
+def _run(payload, progress):
+    p = json.loads(payload)
+    df = pd.DataFrame(p["data"])
+    try:
+        out = validate.run_validation(
+            df, p["mode"], n_surrogates=p["n_surrogates"], tau=p["tau"], m=p["m"],
+            n_trials=p["n_trials"], progress=progress)
+    except validate.ValidationError as e:
+        return json.dumps({"error": str(e)})
+    return json.dumps(out)
+`);
+    runFn = pyodide.globals.get("_run");
+    const ver = pyodide.runPython("validate.__version__");
+    post({ type: "ready", version: ver, pyodide: pyodide.version });
+  } catch (e) {
+    post({ type: "fatal", msg: String(e && e.message || e) });
+  }
+}
+
+function run(payload) {
+  let last = 0;
+  const progress = (stage, done, total, label) => {
+    const now = Date.now();
+    if (stage !== "surrogates" || now - last > 120 || done === total) {
+      last = now;
+      post({ type: "progress", stage, done, total, label });
+    }
+  };
+  try {
+    const out = runFn(JSON.stringify(payload), progress);
+    post({ type: "result", json: out });
+  } catch (e) {
+    post({ type: "error", msg: String(e && e.message || e).split("\n").slice(-3).join(" ") });
+  }
+}
+
+self.onmessage = (ev) => {
+  const m = ev.data;
+  if (m.type === "init") init(m);
+  else if (m.type === "run") run(m.payload);
+};
+</script>
+
+<script>
+(() => {
+"use strict";
+
+const PYODIDE_URL = "https://cdn.jsdelivr.net/pyodide/v0.27.7/full/";
+const APP_VERSION = "1.0.0";
+const MIN_ROWS = 500, MAX_ROWS = 5000;
+
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+/* ---------------- state ---------------- */
+let worker = null, workerReady = false, workerFailed = false;
+let parsed = null;        // {rows, name}
+let lastResult = null;
+let running = false;
+let runStart = 0;
+let charts = [];          // {el, draw(width)}
+
+const STAGES = [
+  ["python", "Loading Python"],
+  ["packages", "Installing packages"],
+  ["surrogates", "Running surrogates"],
+  ["done", "Done"],
+];
+let stageState = { current: null, detail: "", frac: 0 };
+
+/* ---------------- worker ---------------- */
+function startWorker() {
+  const src = $("#worker-src").textContent;
+  const url = URL.createObjectURL(new Blob([src], { type: "text/javascript" }));
+  worker = new Worker(url);
+  worker.onmessage = onWorker;
+  worker.onerror = (e) => { workerFailed = true; showFatal(e.message || "worker error"); };
+  worker.postMessage({
+    type: "init",
+    pyodideUrl: PYODIDE_URL,
+    validateUrl: new URL("validate.py?v=" + APP_VERSION, location.href).href,
+  });
+  setStage("python", "fetching the runtime from cdn.jsdelivr.net");
+}
+
+function onWorker(ev) {
+  const m = ev.data;
+  switch (m.type) {
+    case "stage": setStage(m.stage, m.msg); break;
+    case "detail": stageState.detail = m.msg; renderStatus(); break;
+    case "ready":
+      workerReady = true;
+      $("#version").textContent = "validate.py " + m.version + " · Pyodide " + m.pyodide;
+      setStage(null, "");
+      renderStatus();
+      updateRunButton();
+      break;
+    case "fatal": workerFailed = true; showFatal(m.msg); break;
+    case "progress": onProgress(m); break;
+    case "result": onResult(m.json); break;
+    case "error": running = false; updateRunButton(); setStage(null, ""); showErrors([m.msg], [], "The analysis failed:"); break;
+  }
+}
+
+function setStage(stage, msg) {
+  stageState.current = stage;
+  stageState.detail = msg || "";
+  stageState.frac = 0;
+  renderStatus();
+}
+
+function onProgress(m) {
+  if (m.stage === "garch") { stageState.current = "surrogates"; stageState.detail = "Fitting GARCH(1,1)"; stageState.frac = 0; }
+  else if (m.stage === "surrogates") {
+    stageState.current = "surrogates";
+    stageState.frac = m.done / m.total;
+    const el = (Date.now() - runStart) / 1000;
+    let eta = "";
+    if (m.done > 4 && m.done < m.total) {
+      const left = el / m.done * (m.total - m.done);
+      eta = " · about " + (left < 60 ? Math.ceil(left / 5) * 5 + " s" : Math.round(left / 60) + " min") + " left";
+    }
+    stageState.detail = `Surrogate ${m.done} of ${m.total} (${m.label})${eta}`;
+  } else if (m.stage === "done") { stageState.current = "done"; stageState.detail = ""; stageState.frac = 1; }
+  renderStatus();
+}
+
+function renderStatus() {
+  const st = $("#status");
+  if (workerFailed) return;
+  if (!stageState.current && workerReady && !running) {
+    st.innerHTML = `<p class="note">Python is ready.</p>`;
+    return;
+  }
+  if (!stageState.current) return;
+  const idx = STAGES.findIndex((s) => s[0] === stageState.current);
+  const items = STAGES.map(([k, label], i) => {
+    const finished = stageState.current === "done";
+    const cls = i < idx || finished ? "done" : i === idx ? "active" : "";
+    const extra = i === idx && stageState.detail && k !== "done" ? ": " + esc(stageState.detail) : "";
+    return `<li class="${cls}">${label}${extra}</li>`;
+  }).join("");
+  const showBar = stageState.current === "surrogates";
+  st.innerHTML = `<ul class="stages">${items}</ul>` +
+    (showBar ? `<div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(stageState.frac * 100)}"><div style="width:${(stageState.frac * 100).toFixed(1)}%"></div></div>` : "");
+}
+
+function showFatal(msg) {
+  $("#status").innerHTML = `<div class="errors"><p>Python could not be loaded: ${esc(msg)}</p>
+    <p class="note">Pyodide is fetched from cdn.jsdelivr.net. Check the connection or any content blocker, and that the page is served over http(s) rather than opened as a file. Then reload.</p></div>`;
+  updateRunButton();
+}
+
+function showErrors(list, warns = [], head = "The file cannot be used:") {
+  $("#messages").innerHTML =
+    (list.length ? `<div class="errors"><p>${esc(head)}</p><ul>${list.map((e) => `<li>${esc(e)}</li>`).join("")}</ul></div>` : "") +
+    warns.map((w) => `<p class="warn">${esc(w)}</p>`).join("");
+}
+
+/* ---------------- CSV parsing and validation ---------------- */
+function parseCSV(text) {
+  const rows = [];
+  let row = [], field = "", q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) {
+      if (c === '"') { if (text[i + 1] === '"') { field += '"'; i++; } else q = false; }
+      else field += c;
+    } else if (c === '"') q = true;
+    else if (c === ",") { row.push(field); field = ""; }
+    else if (c === "\n" || c === "\r") {
+      if (c === "\r" && text[i + 1] === "\n") i++;
+      row.push(field); rows.push(row); row = []; field = "";
+    } else field += c;
+  }
+  if (field !== "" || row.length) { row.push(field); rows.push(row); }
+  return rows.filter((r) => !(r.length === 1 && r[0].trim() === ""));
+}
+
+function parseDate(s) {
+  s = s.trim();
+  let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (m) return Date.UTC(+m[1], +m[2] - 1, +m[3]);
+  m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);        // M/D/YYYY, as exported by Excel (US)
+  if (m) return Date.UTC(+m[3], +m[1] - 1, +m[2]);
+  const t = Date.parse(s);
+  return isNaN(t) ? null : t;
+}
+
+function validateCSV(text, mode) {
+  const errors = [], warns = [];
+  const rows = parseCSV(text.replace(/^﻿/, ""));
+  if (rows.length < 2) return { errors: ["The file is empty or has no data rows."] };
+  const header = rows[0].map((h) => h.trim().toLowerCase());
+  const need = ["date", "return"].concat(mode === "strategy" ? ["position"] : []);
+  const missing = need.filter((c) => !header.includes(c));
+  if (missing.length) {
+    errors.push(`Missing column${missing.length > 1 ? "s" : ""}: ${missing.join(", ")}. Found: ${header.join(", ") || "none"}.` +
+      (mode === "strategy" && missing.length === 1 && missing[0] === "position" ? " The strategy test needs a position column." : ""));
+    return { errors };
+  }
+  const ix = Object.fromEntries(need.map((c) => [c, header.indexOf(c)]));
+  const data = { date: [], return: [] };
+  if (mode === "strategy") data.position = [];
+  const times = [];
+  const cap = 5;
+  const empty = [], nonnum = [], baddate = [];
+  for (let r = 1; r < rows.length; r++) {
+    const line = r + 1;
+    const cells = rows[r];
+    const d = (cells[ix.date] ?? "").trim();
+    if (d === "") empty.push(`row ${line}: date is empty`);
+    else {
+      const t = parseDate(d);
+      if (t === null) baddate.push(`row ${line}: "${d}" is not a date`);
+      times.push(t);
+    }
+    data.date.push(d);
+    for (const c of need.slice(1)) {
+      const raw = (cells[ix[c]] ?? "").trim();
+      if (raw === "") { empty.push(`row ${line}: ${c} is empty`); data[c].push(null); continue; }
+      const v = Number(raw);
+      if (!Number.isFinite(v)) { nonnum.push(`row ${line}: ${c} "${raw.slice(0, 20)}" is not a number`); data[c].push(null); }
+      else data[c].push(v);
+    }
+  }
+  const report = (list, what) => {
+    if (!list.length) return;
+    errors.push(`${list.length} ${what}. First: ${list.slice(0, cap).join("; ")}${list.length > cap ? "; …" : ""}.`);
+  };
+  report(empty, "missing value" + (empty.length > 1 ? "s (gaps)" : " (gap)"));
+  report(nonnum, "non-numeric value" + (nonnum.length > 1 ? "s" : ""));
+  report(baddate, "unreadable date" + (baddate.length > 1 ? "s" : ""));
+
+  const n = rows.length - 1;
+  if (n < MIN_ROWS) errors.push(`The file has ${n} rows. At least ${MIN_ROWS} are needed for the tests to have useful power.`);
+
+  if (!baddate.length && !empty.length && times.length > 1) {
+    const order = [];
+    for (let i = 1; i < times.length; i++) {
+      if (times[i] === times[i - 1]) order.push(`row ${i + 2} repeats the date of row ${i + 1}`);
+      else if (times[i] < times[i - 1]) order.push(`row ${i + 2} is earlier than row ${i + 1}`);
+      if (order.length > cap) break;
+    }
+    if (order.length) errors.push(`Dates must be strictly increasing (oldest first). ${order.slice(0, cap).join("; ")}.`);
+    else {
+      const steps = times.slice(1).map((t, i) => t - times[i]).sort((a, b) => a - b);
+      const med = steps[Math.floor(steps.length / 2)];
+      const limit = Math.max(10 * med, 7 * 864e5);
+      const gaps = [];
+      for (let i = 1; i < times.length; i++) {
+        if (times[i] - times[i - 1] > limit) gaps.push(`${data.date[i - 1]} to ${data.date[i]} (${Math.round((times[i] - times[i - 1]) / 864e5)} days, row ${i + 2})`);
+      }
+      if (gaps.length) errors.push(`${gaps.length} gap${gaps.length > 1 ? "s" : ""} in the dates, longer than ten typical intervals: ${gaps.slice(0, cap).join("; ")}${gaps.length > cap ? "; …" : ""}. Fill or remove the missing periods so returns are consecutive.`);
+    }
+  }
+
+  if (!errors.length) {
+    const r = data.return;
+    if (r.every((v) => v > 0)) errors.push("Every value in the return column is positive. This looks like a price series; convert prices to returns first.");
+    else if (new Set(r).size < 10) errors.push("The return column has fewer than 10 distinct values.");
+    if (mode === "strategy" && data.position.every((v) => v === 0)) errors.push("Every position is zero.");
+  }
+  if (!errors.length) {
+    const r = data.return;
+    if (n > MAX_ROWS) warns.push(`The file has ${n} rows. Only the most recent ${MAX_ROWS} will be used, to keep run time bounded.`);
+    if (Math.max(...r.map(Math.abs)) > 1) warns.push("Some returns exceed 100% in absolute value. If the column is in percent, results are unaffected (all statistics are scale-free), but check the data.");
+  }
+  return { errors, warns, data, n };
+}
+
+/* ---------------- input handling ---------------- */
+const mode = () => document.querySelector("input[name=mode]:checked").value;
+
+function updateMode() {
+  const m = mode();
+  document.querySelectorAll("[data-series]").forEach((e) => (e.hidden = m !== "series"));
+  document.querySelectorAll("[data-strategy]").forEach((e) => (e.hidden = m !== "strategy"));
+  $("#mode-note").textContent = m === "series"
+    ? "Series test: BDS and Lyapunov statistics on the returns and on their GARCH(1,1) residuals."
+    : "Strategy test: the Sharpe ratio of position × return against surrogate and permutation nulls, plus the deflated Sharpe ratio.";
+  if (parsed) loadText(parsed.text, parsed.name);
+  updateRunButton();
+}
+
+function loadText(text, name) {
+  parsed = { text, name, check: validateCSV(text, mode()) };
+  const c = parsed.check;
+  $("#filename").textContent = name + (c.n ? ` · ${c.n} rows` : "");
+  showErrors(c.errors, c.warns || []);
+  updateRunButton();
+}
+
+function updateRunButton() {
+  const ok = parsed && !parsed.check.errors.length;
+  $("#run").disabled = !ok || !workerReady || running;
+  let note = "";
+  if (ok && !workerReady && !workerFailed) note = "Waiting for Python to load.";
+  else if (ok && workerReady && !running) {
+    const n = Math.min(parsed.check.n, MAX_ROWS);
+    const sur = +$("#opt-n").value || 199;
+    // measured in Chrome on a laptop: about 0.18 s per series surrogate at n = 1500
+    const perSur = mode() === "series" ? 0.18 * Math.pow(n / 1500, 1.7) : 0.01 * n / 1500;
+    const est = 2 * sur * perSur;
+    note = "Estimated run time " + (est < 60 ? "under a minute" : "about " + Math.round(est / 60) + " min") + ", depending on the device.";
+  }
+  $("#runtime-note").textContent = note;
+}
+
+$("#file").addEventListener("change", (e) => {
+  const f = e.target.files[0];
+  if (!f) return;
+  if (f.size > 20e6) { showErrors(["The file is larger than 20 MB."]); return; }
+  const rd = new FileReader();
+  rd.onload = () => loadText(String(rd.result), f.name);
+  rd.onerror = () => showErrors(["The file could not be read."]);
+  rd.readAsText(f);
+});
+
+$("#sample").addEventListener("click", async () => {
+  if (location.protocol === "file:") {
+    showErrors(["The browser does not let a page opened from disk read other files. Start a local server (see below) and open http://localhost:8000."],
+      [], "The sample data cannot be loaded:");
+    return;
+  }
+  try {
+    const r = await fetch("sample_data.csv", { cache: "no-cache" });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    $("#file").value = "";
+    loadText(await r.text(), "sample_data.csv (synthetic GARCH(1,1), with a momentum position)");
+  } catch (e) {
+    showErrors(["Could not load sample_data.csv: " + e.message], [], "The sample data cannot be loaded:");
+  }
+});
+
+document.querySelectorAll("input[name=mode]").forEach((r) => r.addEventListener("change", updateMode));
+$("#opt-n").addEventListener("input", updateRunButton);
+
+function intOrNull(id, lo, hi, label, errs) {
+  const s = $(id).value.trim();
+  if (s === "" || s.toLowerCase() === "auto") return null;
+  const v = Number(s);
+  if (!Number.isInteger(v) || v < lo || v > hi) { errs.push(`${label} must be a whole number from ${lo} to ${hi}, or blank for auto.`); return null; }
+  return v;
+}
+
+$("#run").addEventListener("click", () => {
+  if (!parsed || parsed.check.errors.length) return;
+  const errs = [];
+  const nSur = intOrNull("#opt-n", 19, 999, "Surrogates", errs) ?? 199;
+  const tau = mode() === "series" ? intOrNull("#opt-tau", 1, 50, "Delay τ", errs) : null;
+  const m = mode() === "series" ? intOrNull("#opt-m", 2, 12, "Embedding m", errs) : null;
+  const trials = mode() === "strategy" ? (intOrNull("#opt-trials", 1, 100000, "Variants tried", errs) ?? 1) : 1;
+  if (errs.length) { showErrors(errs, [], "Check the advanced options:"); return; }
+  showErrors([], parsed.check.warns || []);
+  running = true;
+  runStart = Date.now();
+  updateRunButton();
+  $("#results").hidden = true;
+  setStage("surrogates", "Starting");
+  worker.postMessage({ type: "run", payload: {
+    data: parsed.check.data, mode: mode(), n_surrogates: nSur, tau, m, n_trials: trials,
+  }});
+});
+
+function onResult(json) {
+  running = false;
+  const res = JSON.parse(json);
+  if (res.error) { updateRunButton(); setStage(null, ""); showErrors([res.error], [], "The analysis stopped:"); return; }
+  lastResult = res;
+  lastResult.elapsed = (Date.now() - runStart) / 1000;
+  lastResult.source = parsed.name;
+  stageState = { current: "done", detail: "", frac: 1 };
+  renderStatus();
+  const t = lastResult.elapsed;
+  $("#status").insertAdjacentHTML("beforeend", `<p class="note">Completed in ${t < 90 ? t.toFixed(0) + " s" : (t / 60).toFixed(1) + " min"}.</p>`);
+  renderResults(res);
+  updateRunButton();
+}
+
+/* ---------------- number formatting ---------------- */
+function fmt(v, d = 3) {
+  if (v === null || v === undefined || !Number.isFinite(v)) return "–";
+  const a = Math.abs(v);
+  if (a !== 0 && (a < 1e-3 || a >= 1e5)) return v.toExponential(2).replace("-", "−");
+  return v.toFixed(d).replace("-", "−");
+}
+const fmtP = (p) => (p === null || p === undefined) ? "–" : p < 0.001 ? "<0.001" : p.toFixed(3);
+function quantile(arr, q) {
+  const s = arr.filter(Number.isFinite).slice().sort((a, b) => a - b);
+  const pos = (s.length - 1) * q, lo = Math.floor(pos), hi = Math.ceil(pos);
+  return s[lo] + (s[hi] - s[lo]) * (pos - lo);
+}
+
+/* ---------------- charts (plain SVG) ---------------- */
+function niceTicks(lo, hi, n = 5) {
+  const span = hi - lo || 1;
+  const step0 = Math.pow(10, Math.floor(Math.log10(span / n)));
+  const err = span / n / step0;
+  const step = step0 * (err >= 7.5 ? 10 : err >= 3.5 ? 5 : err >= 1.5 ? 2 : 1);
+  const out = [];
+  for (let v = Math.ceil(lo / step) * step; v <= hi + step * 1e-9; v += step) out.push(+v.toPrecision(12));
+  return { ticks: out, step };
+}
+function tickLabel(v, step) {
+  const dec = Math.max(0, -Math.floor(Math.log10(step)));
+  return v.toFixed(Math.min(dec, 6)).replace("-", "−");
+}
+
+function histogramSVG(values, observed, width, label) {
+  const H = 170, ml = 4, mr = 4, mt = 26, mb = 30;
+  const W = Math.max(260, width);
+  const vals = values.filter(Number.isFinite);
+  let lo = Math.min(...vals, observed), hi = Math.max(...vals, observed);
+  const pad = (hi - lo || Math.abs(hi) || 1) * 0.06;
+  lo -= pad; hi += pad;
+  const iw = W - ml - mr, ih = H - mt - mb;
+  const nb = Math.max(12, Math.min(36, Math.round(Math.sqrt(vals.length) * 2.2)));
+  const sMin = Math.min(...vals), sMax = Math.max(...vals);
+  const bw = (sMax - sMin) / nb || 1;
+  const counts = new Array(nb).fill(0);
+  vals.forEach((v) => { counts[Math.min(nb - 1, Math.floor((v - sMin) / bw))]++; });
+  const cmax = Math.max(...counts);
+  const x = (v) => ml + (v - lo) / (hi - lo) * iw;
+  const y = (c) => mt + ih - c / cmax * ih;
+  let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(label)}">`;
+  for (let i = 0; i < nb; i++) {
+    if (!counts[i]) continue;
+    const a = sMin + i * bw, b = a + bw;
+    const x0 = x(a), x1 = x(b);
+    const tip = `${fmt(a, 4)} to ${fmt(b, 4)}: ${counts[i]} surrogate${counts[i] > 1 ? "s" : ""}`;
+    s += `<rect x="${(x0 + 1).toFixed(1)}" y="${y(counts[i]).toFixed(1)}" width="${Math.max(1, x1 - x0 - 2).toFixed(1)}" height="${(mt + ih - y(counts[i])).toFixed(1)}" fill="var(--bar)" data-tip="${esc(tip)}"><title>${esc(tip)}</title></rect>`;
+    s += `<rect x="${x0.toFixed(1)}" y="${mt}" width="${(x1 - x0).toFixed(1)}" height="${ih}" fill="transparent" data-tip="${esc(tip)}"/>`;
+  }
+  s += `<line x1="${ml}" x2="${W - mr}" y1="${mt + ih + 0.5}" y2="${mt + ih + 0.5}" stroke="var(--faint)" stroke-width="1"/>`;
+  const { ticks, step } = niceTicks(lo, hi, W < 420 ? 4 : 6);
+  ticks.forEach((t) => {
+    const tx = x(t);
+    if (tx < ml + 12 || tx > W - mr - 12) return;
+    s += `<line x1="${tx.toFixed(1)}" x2="${tx.toFixed(1)}" y1="${mt + ih}" y2="${mt + ih + 4}" stroke="var(--faint)"/>`;
+    s += `<text x="${tx.toFixed(1)}" y="${mt + ih + 17}" text-anchor="middle">${tickLabel(t, step)}</text>`;
+  });
+  const ox = x(observed);
+  const anchor = ox > W * 0.72 ? "end" : "start";
+  const dx = anchor === "end" ? -6 : 6;
+  s += `<line x1="${ox.toFixed(1)}" x2="${ox.toFixed(1)}" y1="${mt - 14}" y2="${mt + ih}" stroke="var(--accent)" stroke-width="2"/>`;
+  s += `<text class="obs-label" x="${(ox + dx).toFixed(1)}" y="${mt - 4}" text-anchor="${anchor}">observed ${fmt(observed, 4)}</text>`;
+  s += `</svg>`;
+  return s;
+}
+
+function curveSVG(curve, width, label) {
+  const H = 190, ml = 44, mr = 8, mt = 10, mb = 32;
+  const W = Math.max(260, width);
+  const k = curve.k, o = curve.observed, mu = curve.surrogate_mean, lo = curve.surrogate_lo, hi = curve.surrogate_hi;
+  const all = [].concat(o, lo, hi).filter(Number.isFinite);
+  let y0 = Math.min(...all), y1 = Math.max(...all);
+  const pad = (y1 - y0 || 1) * 0.08; y0 -= pad; y1 += pad;
+  const iw = W - ml - mr, ih = H - mt - mb;
+  const x = (v) => ml + (v - k[0]) / (k[k.length - 1] - k[0] || 1) * iw;
+  const y = (v) => mt + ih - (v - y0) / (y1 - y0) * ih;
+  const path = (arr) => arr.map((v, i) => `${i ? "L" : "M"}${x(k[i]).toFixed(1)},${y(v).toFixed(1)}`).join("");
+  let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(label)}">`;
+  const yt = niceTicks(y0, y1, 4);
+  yt.ticks.forEach((t) => {
+    s += `<line x1="${ml}" x2="${W - mr}" y1="${y(t).toFixed(1)}" y2="${y(t).toFixed(1)}" stroke="var(--rule)" stroke-width="1"/>`;
+    s += `<text x="${ml - 6}" y="${(y(t) + 4).toFixed(1)}" text-anchor="end">${tickLabel(t, yt.step)}</text>`;
+  });
+  const band = hi.map((v, i) => `${i ? "L" : "M"}${x(k[i]).toFixed(1)},${y(v).toFixed(1)}`).join("") +
+    lo.slice().reverse().map((v, j) => { const i = lo.length - 1 - j; return `L${x(k[i]).toFixed(1)},${y(v).toFixed(1)}`; }).join("") + "Z";
+  s += `<path d="${band}" fill="var(--band)"/>`;
+  s += `<path d="${path(mu)}" fill="none" stroke="var(--bar)" stroke-width="2" stroke-dasharray="5 3"/>`;
+  s += `<path d="${path(o)}" fill="none" stroke="var(--accent)" stroke-width="2"/>`;
+  k.forEach((kv, i) => {
+    s += `<circle cx="${x(kv).toFixed(1)}" cy="${y(o[i]).toFixed(1)}" r="2.5" fill="var(--accent)"/>`;
+    const tip = `k = ${kv}: observed ${fmt(o[i], 3)}, surrogates ${fmt(mu[i], 3)} (${fmt(lo[i], 3)} to ${fmt(hi[i], 3)})`;
+    const half = iw / Math.max(1, k.length - 1) / 2;
+    s += `<rect x="${(x(kv) - half).toFixed(1)}" y="${mt}" width="${(2 * half).toFixed(1)}" height="${ih}" fill="transparent" data-tip="${esc(tip)}"><title>${esc(tip)}</title></rect>`;
+    if (W >= 420 || i % 2 === 0) s += `<text x="${x(kv).toFixed(1)}" y="${mt + ih + 16}" text-anchor="middle">${kv}</text>`;
+  });
+  s += `<line x1="${ml}" x2="${W - mr}" y1="${mt + ih + 0.5}" y2="${mt + ih + 0.5}" stroke="var(--faint)"/>`;
+  s += `<text x="${(ml + iw / 2).toFixed(1)}" y="${H - 2}" text-anchor="middle">steps along trajectory, k</text>`;
+  s += `</svg>`;
+  return s;
+}
+
+const tipEl = $("#tip");
+document.addEventListener("mousemove", (e) => {
+  const t = e.target.closest && e.target.closest("[data-tip]");
+  if (!t) { tipEl.style.display = "none"; return; }
+  tipEl.textContent = t.getAttribute("data-tip");
+  tipEl.style.display = "block";
+  const w = tipEl.offsetWidth;
+  const left = Math.min(window.innerWidth - w - 8, e.clientX + 12);
+  tipEl.style.left = Math.max(8, left) + "px";
+  tipEl.style.top = (e.clientY - 34) + "px";
+});
+
+function drawCharts() {
+  charts.forEach((c) => { c.el.innerHTML = c.draw(Math.floor(c.el.clientWidth)); });
+}
+let rz;
+window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(drawCharts, 120); });
+
+/* ---------------- results ---------------- */
+function resultsHTML(res, chartWidth) {
+  // chartWidth: number for a static render (report), null for live charts
+  const list = [];
+  const chart = (draw, cls = "chart") => {
+    if (chartWidth) return `<div class="${cls}">${draw(chartWidth)}</div>`;
+    const id = "c" + Math.random().toString(36).slice(2, 9);
+    list.push({ id, draw });
+    return `<div class="${cls}" id="${id}"></div>`;
+  };
+  const isSeries = res.mode === "series";
+  let h = "";
+  h += `<p class="meta">${esc(res.source || "")} · <span class="num">${res.n_obs}</span> observations, ${esc(res.start)} to ${esc(res.end)} · <span class="num">${res.n_surrogates}</span> IAAFT surrogates, seed ${res.seed}`;
+  if (isSeries) h += ` · τ = <span class="num">${res.params.tau}</span>${res.params.tau_auto ? " (auto)" : ""}, m = <span class="num">${res.params.m}</span>${res.params.m_auto ? " (auto)" : ""}`;
+  h += `</p>`;
+  (res.warnings || []).forEach((w) => (h += `<p class="warn">${esc(w)}</p>`));
+
+  h += `<div class="overall"><div class="tag">Overall · ${esc(res.overall.method)}</div><p class="verdict" style="margin:6px 0 0">${esc(res.overall.verdict)}</p></div>`;
+
+  // summary table
+  h += `<div class="table-wrap"><table><thead><tr><th>Test</th><th class="r">Observed</th><th class="r">Surrogate median</th><th class="r">Surrogate 95% range</th><th class="r">p</th>${isSeries ? `<th class="r">p, Holm</th>` : ""}<th>Result at 5%</th></tr></thead><tbody>`;
+  res.tests.forEach((t) => {
+    const s = t.surrogate;
+    h += `<tr><td>${esc(t.name)}</td><td class="r">${fmt(t.statistic, 4)}</td>` +
+      `<td class="r">${s ? fmt(quantile(s, 0.5), 4) : "–"}</td>` +
+      `<td class="r">${s ? fmt(quantile(s, 0.025), 3) + " to " + fmt(quantile(s, 0.975), 3) : "–"}</td>` +
+      `<td class="r">${fmtP(t.p_value)}</td>${isSeries ? `<td class="r">${fmtP(t.p_holm)}</td>` : ""}` +
+      `<td>${t.reject ? "reject" : "do not reject"}</td></tr>`;
+  });
+  h += `</tbody></table></div>`;
+  h += `<p class="note">${isSeries
+    ? "Two-sided rank p-values against the surrogate distribution. The Holm column adjusts for running four tests; the overall verdict uses it."
+    : "One-sided rank p-values: the probability of a Sharpe ratio at least this high under each null. For the deflated Sharpe ratio, p is 1 − DSR."}</p>`;
+
+  // per test
+  res.tests.forEach((t) => {
+    h += `<div class="test"><h3>${esc(t.name)}</h3><p class="verdict">${esc(t.verdict)}</p>`;
+    if (t.surrogate) {
+      const cap = `${esc(t.stat_label)}. Grey bars: ${t.surrogate.length} surrogates. Line: observed value.`;
+      h += `<figure>${chart((w) => histogramSVG(t.surrogate, t.statistic, w, t.name + " surrogate distribution"))}<figcaption>${cap}</figcaption></figure>`;
+    }
+    if (t.per_m) {
+      h += `<div class="table-wrap"><table><thead><tr><th>m</th>${t.per_m.map((r) => `<th class="r">${r.m}</th>`).join("")}</tr></thead><tbody>` +
+        `<tr><td>BDS statistic</td>${t.per_m.map((r) => `<td class="r">${fmt(r.stat, 2)}</td>`).join("")}</tr>` +
+        `<tr><td>Asymptotic p</td>${t.per_m.map((r) => `<td class="r">${fmtP(r.p_asymptotic)}</td>`).join("")}</tr>` +
+        `</tbody></table></div><p class="note">Asymptotic N(0,1) p-values, for reference. On GARCH residuals they are known to be oversized; the surrogate p-value above does not rely on them.</p>`;
+    }
+    if (t.curve) {
+      h += `<figure><div class="legend"><span><span class="sw" style="background:var(--accent)"></span>observed</span><span><span class="sw" style="border-top:2px dashed var(--bar);height:0"></span>surrogate mean</span><span><span class="sw band" style="background:var(--band)"></span>surrogate 95% band</span></div>` +
+        chart((w) => curveSVG(t.curve, w, t.name + " divergence curve")) +
+        `<figcaption>Mean log divergence of nearest-neighbour trajectories (Rosenstein). The exponent is the slope. A chaotic series shows a straight scaling region that differs from the band; noise saturates at once.</figcaption></figure>`;
+    }
+    if (t.id === "deflated_sharpe") {
+      h += `<p class="note">Benchmark Sharpe ratio SR₀ = <span class="num">${fmt(t.sr0_annualised, 3)}</span> (annualised) for ${t.n_trials} variant${t.n_trials > 1 ? "s" : ""} tried.</p>`;
+    }
+    h += `</div>`;
+  });
+
+  if (isSeries && res.garch) {
+    const g = res.garch.params;
+    h += `<h3>GARCH(1,1) estimates</h3><div class="table-wrap"><table><thead><tr><th>μ</th><th class="r">ω</th><th class="r">α</th><th class="r">β</th><th class="r">α + β</th><th class="r">ν (t d.o.f.)</th><th class="r">Log-likelihood</th></tr></thead><tbody>` +
+      `<tr><td class="r" style="text-align:left;padding-left:0">${fmt(g.mu, 5)}</td><td class="r">${fmt(g.omega, 3)}</td><td class="r">${fmt(g.alpha, 4)}</td><td class="r">${fmt(g.beta, 4)}</td><td class="r">${fmt(g.persistence, 4)}</td><td class="r">${fmt(g.nu, 2)}</td><td class="r">${fmt(res.garch.loglik, 1)}</td></tr></tbody></table></div>` +
+      (res.garch.converged ? "" : `<p class="warn">The optimiser did not report convergence; treat the residual tests with caution.</p>`);
+  }
+  if (!isSeries) {
+    const s = res.summary;
+    h += `<h3>Strategy summary</h3><div class="table-wrap"><table><thead><tr><th class="r" style="text-align:left;padding-left:0">Sharpe</th><th class="r">Return</th><th class="r">Volatility</th><th class="r">Skewness</th><th class="r">Kurtosis</th><th class="r">Mean |position|</th></tr></thead><tbody>` +
+      `<tr><td class="r" style="text-align:left;padding-left:0">${fmt(s.sharpe_annualised, 3)}</td><td class="r">${fmt(s.mean_annualised * 100, 2)}%</td><td class="r">${fmt(s.vol_annualised * 100, 2)}%</td><td class="r">${fmt(s.skew, 3)}</td><td class="r">${fmt(s.kurtosis, 3)}</td><td class="r">${fmt(s.mean_abs_position, 3)}</td></tr></tbody></table></div>` +
+      `<p class="note">Annualised with ${s.periods_per_year} periods per year. Kurtosis is Pearson (3 for a normal distribution).</p>`;
+  }
+  return { html: h, list };
+}
+
+function renderResults(res) {
+  const { html, list } = resultsHTML(res, null);
+  $("#results-body").innerHTML = html;
+  $("#results").hidden = false;
+  charts = list.map((c) => ({ el: document.getElementById(c.id), draw: c.draw }));
+  drawCharts();
+  $("#results").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+/* ---------------- report ---------------- */
+$("#download").addEventListener("click", () => {
+  if (!lastResult) return;
+  const css = document.querySelector("style").textContent;
+  const { html } = resultsHTML(lastResult, 680);
+  const method = $("#about").innerHTML;
+  const stamp = new Date().toISOString().slice(0, 16).replace("T", " ");
+  const doc = `<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Surrogate data test report</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<style>${css}
+.chart svg { max-width: 100%; height: auto; }
+@media print { section { break-inside: auto; } .test { break-inside: avoid; } }</style></head>
+<body><main>
+<header><h1>Surrogate data test report</h1>
+<p class="meta">${lastResult.mode === "series" ? "Series test" : "Strategy test"} · generated ${stamp} UTC · validate.py ${esc(lastResult.version)} · run time ${lastResult.elapsed.toFixed(0)} s</p></header>
+<section>${html}</section>
+<section class="prose">${method}</section>
+</main></body></html>`;
+  const blob = new Blob([doc], { type: "text/html" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `surrogate-test-${lastResult.mode}-${new Date().toISOString().slice(0, 10)}.html`;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+});
+
+/* ---------------- boot ---------------- */
+updateMode();
+if (location.protocol === "file:") {
+  workerFailed = true;
+  $("#status").innerHTML = `<div class="errors"><p>This page was opened as a file, so Python cannot load. It must be served over http(s).</p><p class="note">In a terminal, run <code>cd</code> to this folder, then <code>python -m http.server 8000</code>, and open <a href="http://localhost:8000/">http://localhost:8000</a>. Once the site is on GitHub Pages this step is not needed.</p></div>`;
+} else {
+  startWorker();
+}
+})();
+</script>
+</body>
+</html>
