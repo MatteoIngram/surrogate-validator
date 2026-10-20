@@ -8,7 +8,8 @@ would not produce?
 Methodology refactored from the dissertation pipeline (BDS.py,
 surrogatedata.py, CODE/LS.py):
   - IAAFT surrogates, 100 iterations, stop when ranks stop changing
-  - GARCH(1,1), constant mean, Student-t innovations; standardised residuals
+  - GARCH(1,1), Student-t innovations, fitted to AR(p)-prewhitened returns
+    (the AR mean follows surrogatedata.py; p chosen by BIC)
   - BDS with epsilon = 1.5 standard deviations
   - delay tau = first local minimum of average mutual information (64 bins)
   - embedding dim m = first m with < 1% false nearest neighbours
@@ -39,7 +40,7 @@ import numpy as np
 from scipy import optimize, signal, special, stats
 from scipy.spatial import cKDTree
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 DEFAULT_SURROGATES = 199
 MAX_OBS = 5000
@@ -364,6 +365,28 @@ def _fmt_p(p):
 # ======================================================================
 #  Series test
 # ======================================================================
+def ar_prewhiten(x, max_p=10):
+    """Remove linear dependence with an AR(p) fitted by least squares, p in
+    0..max_p chosen by BIC (Hsieh 1991 prewhitens returns this way before
+    BDS). Returns (residuals, p, coefficients). Residuals are p shorter."""
+    x = np.asarray(x, float)
+    n = len(x)
+    y = x[max_p:]
+    best = None
+    for p in range(0, max_p + 1):
+        X = np.column_stack([np.ones(n - max_p)] +
+                            [x[max_p - k: n - k] for k in range(1, p + 1)])
+        beta, *_ = np.linalg.lstsq(X, y, rcond=None)
+        rss = float(np.sum((y - X @ beta) ** 2))
+        bic = len(y) * np.log(rss / len(y)) + (p + 1) * np.log(len(y))
+        if best is None or bic < best[0]:
+            best = (bic, p)
+    p = best[1]
+    X = np.column_stack([np.ones(n - p)] + [x[p - k: n - k] for k in range(1, p + 1)])
+    beta, *_ = np.linalg.lstsq(X, x[p:], rcond=None)
+    return x[p:] - X @ beta, p, beta
+
+
 def _bds_summary(stats_by_m):
     """Single pre-specified statistic for the surrogate comparison:
     the mean BDS statistic over m = 2..m_max (avoids testing each m)."""
@@ -371,17 +394,21 @@ def _bds_summary(stats_by_m):
 
 
 def _series_block(x, label, key, tau, m, n_surrogates, m_max, seed,
-                  progress, step0, total):
-    """BDS and Lyapunov on one series against its IAAFT surrogates."""
-    bds_obs = bds_test(x, m_max)
+                  progress, step0, total, bds_x=None, bds_note=""):
+    """BDS and Lyapunov on one series against IAAFT surrogates. BDS runs on
+    bds_x (the prewhitened series) when given, with its own surrogates."""
+    w = x if bds_x is None else bds_x
+    bds_obs = bds_test(w, m_max)
     ly_obs = lyapunov(x, tau=tau, m=m, curve=True)
     bds_sur = np.empty(n_surrogates)
     ly_sur = np.empty(n_surrogates)
     curves = []
     rng = np.random.default_rng(seed)
+    rng_b = np.random.default_rng([seed, 1])
     for i in range(n_surrogates):
         s = iaaft(x, rng)
-        bds_sur[i] = _bds_summary(bds_test(s, m_max)["stat"])
+        sb = s if bds_x is None else iaaft(w, rng_b)
+        bds_sur[i] = _bds_summary(bds_test(sb, m_max)["stat"])
         ly = lyapunov(s, tau=ly_obs["tau"], m=ly_obs["m"], curve=True)
         ly_sur[i] = ly["lambda"]
         curves.append(ly["divergence"])
@@ -395,7 +422,7 @@ def _series_block(x, label, key, tau, m, n_surrogates, m_max, seed,
             "series": key,
             "name": f"BDS, {label}",
             "statistic": bds_stat,
-            "stat_label": f"mean BDS statistic, m = 2..{m_max}",
+            "stat_label": f"mean BDS statistic, m = 2..{m_max}{bds_note}",
             "p_value": rank_p_value(bds_stat, bds_sur, tail="two-sided"),
             "tail": "two-sided",
             "per_m": [{"m": mm, "stat": float(s), "p_asymptotic": float(p)}
@@ -499,20 +526,25 @@ def _series_verdicts(tests, alpha):
 
 def series_test(returns, n_surrogates=DEFAULT_SURROGATES, tau=None, m=None,
                 m_max=5, seed=0, alpha=ALPHA, progress=None):
-    """BDS on raw returns and on GARCH(1,1) standardised residuals, and the
-    Rosenstein Lyapunov exponent of each, all against IAAFT surrogates.
+    """BDS on AR(p)-prewhitened returns and on AR(p)-GARCH(1,1) standardised
+    residuals, and the Rosenstein Lyapunov exponent of the raw returns and of
+    the residuals, all against IAAFT surrogates.
     Each test gets a rank-based p-value; the overall verdict uses
     Holm-adjusted p-values across the four tests."""
     progress = progress or _noop
     x = np.asarray(returns, float)
     total = 2 * n_surrogates
 
-    progress("garch", 0, total, "fitting GARCH(1,1)")
-    g = garch_filter(x)
+    progress("garch", 0, total, "fitting AR(p)-GARCH(1,1)")
+    # linear dependence is part of the null: remove it before BDS and GARCH,
+    # otherwise BDS rejects purely linear processes (AR(1), phi = 0.3: 35%)
+    w, ar_p, _ = ar_prewhiten(x)
+    g = garch_filter(w)
     z = g["std_resid"]
 
     raw = _series_block(x, "raw returns", "raw", tau, m, n_surrogates,
-                        m_max, seed, progress, 0, total)
+                        m_max, seed, progress, 0, total, bds_x=w,
+                        bds_note=f", after AR({ar_p}) prewhitening")
     # residuals use the embedding chosen on the raw series, so the two
     # Lyapunov tests are comparable
     resid = _series_block(z, "GARCH residuals", "resid", raw["tau"], raw["m"],
@@ -541,7 +573,7 @@ def series_test(returns, n_surrogates=DEFAULT_SURROGATES, tau=None, m=None,
         "overall": {"reject": any_reject, "method": "Holm", "alpha": alpha,
                     "verdict": overall},
         "garch": {k: v for k, v in g.items() if k not in ("std_resid", "cond_vol")},
-        "params": {"tau": raw["tau"], "m": raw["m"], "tau_auto": raw["tau_auto"],
+        "params": {"ar_order": ar_p, "tau": raw["tau"], "m": raw["m"], "tau_auto": raw["tau_auto"],
                    "m_auto": raw["m_auto"], "bds_eps": BDS_EPS, "m_max": m_max,
                    "min_tsep": LYAP_TSEP, "trajectory_len": LYAP_FIT},
     }

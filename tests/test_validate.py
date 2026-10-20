@@ -125,6 +125,19 @@ def test_bds_counts_do_not_overflow_int32():
     assert np.all(np.abs(v.bds_test(x)["stat"]) > 2)   # GARCH: strongly dependent
 
 
+def test_ar_prewhiten_removes_linear_dependence():
+    rng = np.random.default_rng(5)
+    e = rng.standard_normal(3000)
+    x = np.zeros_like(e)
+    for t in range(1, len(e)):
+        x[t] = 0.3 * x[t - 1] + e[t]
+    w, p, beta = v.ar_prewhiten(x)
+    assert p == 1 and abs(beta[1] - 0.3) < 0.05
+    assert abs(np.corrcoef(w[1:], w[:-1])[0, 1]) < 0.05
+    # white noise needs no filter
+    assert v.ar_prewhiten(e)[1] == 0
+
+
 def test_holm():
     adj = v.holm([0.01, 0.04, 0.03, 0.5])
     assert np.allclose(adj, [0.04, 0.09, 0.09, 0.5])
