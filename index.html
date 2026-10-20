@@ -1330,6 +1330,7 @@ async function renderStudy() {
     const nRes = A.filter((a) => p(a, "bds_resid") < 0.05).length;
     const cell = (v) => `<td class="r"${v < 0.05 ? ' style="font-weight:600;color:var(--fg)"' : ""}>${fmtP(v)}</td>`;
     let h = `<p>The series test applied to ${A.length} assets, using the most recent ${s.n_obs.toLocaleString("en-GB")} daily log returns to ${esc(s.end)} and ${s.n_surrogates} surrogates per test.</p>`;
+    h += `<p class="note">Re-run automatically every Saturday with the latest closes. Last run ${esc(s.generated)}.</p>`;
     h += `<p class="verdict">Raw returns reject the null for ${nRaw} of ${A.length} assets; GARCH(1,1) residuals reject for ${nRes} of ${A.length}. ` +
       (nRes === 0
         ? "In every asset class tested, the nonlinear structure in daily returns is accounted for by volatility clustering."

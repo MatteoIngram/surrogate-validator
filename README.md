@@ -14,7 +14,9 @@ All computation runs in the browser with [Pyodide](https://pyodide.org). There i
 | `sample_series.csv` | The same returns without the position column, offered for download as `example_series.csv`. |
 | `tests/test_validate.py` | Native pytest suite. |
 | `study/run_study.py` | Runs the series test on 14 market series (needs `yfinance`; run locally, not by the website). |
-| `study/results.json` | The study's test statistics, shown on the page. No prices are stored. |
+| `study/results.json` | The study's test statistics, shown on the page and refreshed weekly. No prices are stored. |
+| `study/requirements.txt` | Pinned dependencies for the weekly run. |
+| `.github/workflows/weekly-study.yml` | The weekly GitHub Action. |
 
 ## Input
 
@@ -95,13 +97,17 @@ Additional tests cover:
 
 ## Results on market data
 
-`study/run_study.py` runs the series test on 14 daily series to 16 October 2026 (most recent 1,500 log returns each, 199 surrogates): five equity indices, three FX pairs, Bitcoin and Ethereum, gold, Brent, US 10-year Treasury futures, and listed private equity (Invesco PSP, a daily stand-in for private markets).
+`study/run_study.py` runs the series test on 14 daily series (first run: data to 16 October 2026) (most recent 1,500 log returns each, 199 surrogates): five equity indices, three FX pairs, Bitcoin and Ethereum, gold, Brent, US 10-year Treasury futures, and listed private equity (Invesco PSP, a daily stand-in for private markets).
 
 - BDS on prewhitened returns rejects for **14 of 14** series (p = 0.005, the minimum).
 - BDS on AR-GARCH(1,1) residuals rejects for **0 of 14** (smallest p: Bitcoin, 0.075).
 - The raw Lyapunov test rejects only for the S&P 500 (p = 0.03), about what chance predicts across 14 tests, and not after Holm correction. No residual Lyapunov test rejects.
 
 **Conclusion.** In every asset class tested, the nonlinear dependence in daily returns is volatility clustering. There is no evidence of low-dimensional deterministic chaos, and nothing remains for these tests to find once linear autocorrelation and GARCH volatility are modelled. A structural break would produce the same signature, so the study cannot separate smooth volatility clustering from regime shifts.
+
+### Weekly updates
+
+`.github/workflows/weekly-study.yml` re-runs the study every Saturday at 07:00 UTC on GitHub's servers, using the latest completed closes. It runs the fast unit tests, runs the study, and, if the results changed, commits `study/results.json` and rebuilds GitHub Pages; the table and conclusion on the page update from that file. If any download fails after three attempts, or any series is more than ten days stale, the run stops and the previous results stay published; GitHub emails the repository owner about failed runs. Trigger a run by hand from the repository's Actions tab ("Run workflow"). To reproduce a past run locally, set `STUDY_END=YYYY-MM-DD`. Index, FX, crypto and futures series reproduce exactly; the two ETFs (EEM, PSP) can shift slightly because Yahoo re-adjusts past prices for dividends (on re-running the first study, statistics moved in the fourth decimal and p-values by a few ranks).
 
 ## Stress tests
 

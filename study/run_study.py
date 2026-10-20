@@ -1,15 +1,20 @@
 """
 Real-data study: run the series test on major asset classes.
 
-Downloads daily prices with yfinance (run locally; not used by the website),
-computes log returns of the adjusted close, takes the most recent 1,500
-observations up to END, and runs validate.run_validation in series mode
-with 199 IAAFT surrogates.
+Downloads daily prices with yfinance (not used by the website), computes log
+returns of the adjusted close, takes the most recent 1,500 observations
+before END, and runs validate.run_validation in series mode with 199 IAAFT
+surrogates.
+
+END defaults to today (UTC), exclusive, so only completed daily closes are
+used. Set STUDY_END=YYYY-MM-DD to reproduce an earlier run. Runs weekly via
+.github/workflows/weekly-study.yml.
 
 Only test statistics are written to study/results.json. Raw prices are not
-stored or published.
+stored or published. If any asset fails to download or validate, the script
+exits with an error and leaves the existing results.json untouched.
 
-    pip install yfinance
+    pip install -r study/requirements.txt
     python study/run_study.py
 """
 
@@ -26,7 +31,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 import validate as v  # noqa: E402
 
-END = "2026-10-17"          # exclusive: last close used is Friday 16 October 2026
+END = os.environ.get("STUDY_END") or time.strftime("%Y-%m-%d", time.gmtime())  # exclusive
 N_OBS = 1500
 N_SURROGATES = 199
 
@@ -51,19 +56,29 @@ ASSETS = [
 ]
 
 
-def load_returns(ticker):
+def load_returns(ticker, attempts=3):
     import yfinance as yf
-    px = yf.download(ticker, end=END, period="max", auto_adjust=True,
-                     progress=False)["Close"]
-    px = px.squeeze("columns").dropna()
-    px = px[px > 0]
-    r = np.log(px).diff().dropna()
-    return r.iloc[-N_OBS:]
+    for k in range(attempts):
+        try:
+            # start well before the window, so period/end interplay cannot
+            # silently shorten the series
+            px = yf.download(ticker, start="2015-01-01", end=END,
+                             auto_adjust=True, progress=False)["Close"]
+            px = px.squeeze("columns").dropna()
+            px = px[px > 0]
+            r = np.log(px).diff().dropna()
+            if len(r) >= N_OBS:
+                return r.iloc[-N_OBS:]
+            raise ValueError(f"{ticker}: only {len(r)} returns")
+        except Exception as e:  # network errors, empty frames, rate limits
+            if k == attempts - 1:
+                raise RuntimeError(f"{ticker}: download failed ({e})") from e
+            time.sleep(10 * (k + 1))
 
 
-def run_one(spec):
+def run_one(args):
+    spec, r = args
     cls, name, ticker, note = spec
-    r = load_returns(ticker)
     df = pd.DataFrame({"date": r.index.strftime("%Y-%m-%d"), "return": r.values})
     t0 = time.time()
     res = v.run_validation(df, "series", n_surrogates=N_SURROGATES)
@@ -90,11 +105,17 @@ def run_one(spec):
 
 
 def main():
+    # download serially (gentler on Yahoo), test in parallel
+    data = {a[2]: load_returns(a[2]) for a in ASSETS}
+    stale = [t for t, r in data.items()
+             if (pd.Timestamp(END) - r.index[-1]).days > 10]
+    if stale:
+        raise SystemExit(f"stale data, not writing results: {stale}")
     with ProcessPoolExecutor(max_workers=os.cpu_count()) as ex:
-        rows = list(ex.map(run_one, ASSETS))
+        rows = list(ex.map(run_one, [(a, data[a[2]]) for a in ASSETS]))
     out = {
-        "generated": time.strftime("%Y-%m-%d"),
-        "end": "2026-10-16",
+        "generated": time.strftime("%Y-%m-%d", time.gmtime()),
+        "end": max(a["end"] for a in rows),
         "n_obs": N_OBS,
         "n_surrogates": N_SURROGATES,
         "validate_version": v.__version__,

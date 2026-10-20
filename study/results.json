@@ -79,7 +79,7 @@
      "surrogate_q975": 0.13175862259260968
     }
    ],
-   "seconds": 59.1
+   "seconds": 44.1
   },
   {
    "asset_class": "Equity indices",
@@ -154,7 +154,7 @@
      "surrogate_q975": 0.13201527399929439
     }
    ],
-   "seconds": 63.1
+   "seconds": 46.2
   },
   {
    "asset_class": "Equity indices",
@@ -229,7 +229,7 @@
      "surrogate_q975": 0.13129793952569413
     }
    ],
-   "seconds": 61.2
+   "seconds": 43.2
   },
   {
    "asset_class": "Equity indices",
@@ -304,7 +304,7 @@
      "surrogate_q975": 0.1314377132245444
     }
    ],
-   "seconds": 61.2
+   "seconds": 45.4
   },
   {
    "asset_class": "Equity indices",
@@ -320,12 +320,12 @@
     "m": 5
    },
    "garch": {
-    "mu": 0.00020931366644932095,
-    "omega": 4.817962103956678e-06,
-    "alpha": 0.07100474453378673,
-    "beta": 0.8979447132613434,
-    "nu": 7.051297196562497,
-    "persistence": 0.9689494577951301
+    "mu": 0.0002093148625137118,
+    "omega": 4.818006149338627e-06,
+    "alpha": 0.07100493101529218,
+    "beta": 0.8979442262205435,
+    "nu": 7.051277959294492,
+    "persistence": 0.9689491572358356
    },
    "overall": "Nonlinear dependence is present in the raw series but disappears after GARCH(1,1) filtering: the structure is volatility clustering, not predictable dynamics in the mean.",
    "overall_reject": true,
@@ -333,53 +333,53 @@
     {
      "id": "bds_raw",
      "name": "BDS, raw returns",
-     "statistic": 5.296278775383258,
+     "statistic": 5.296091196705653,
      "p_value": 0.005,
      "p_holm": 0.02,
      "reject": true,
      "direction": "above",
-     "surrogate_median": 0.0766749844775594,
-     "surrogate_q025": -1.8127006624265196,
-     "surrogate_q975": 1.9230604000853846
+     "surrogate_median": 0.0894764485230738,
+     "surrogate_q025": -1.802028988500565,
+     "surrogate_q975": 1.9331934574024188
     },
     {
      "id": "bds_resid",
      "name": "BDS, GARCH residuals",
-     "statistic": -0.8186554870904303,
-     "p_value": 0.475,
-     "p_holm": 0.74,
+     "statistic": -0.8179955395615867,
+     "p_value": 0.48,
+     "p_holm": 0.78,
      "reject": false,
      "direction": "below",
-     "surrogate_median": -0.0951020472559215,
-     "surrogate_q025": -1.8160709922672222,
-     "surrogate_q975": 1.6254183263289481
+     "surrogate_median": -0.10029259583044094,
+     "surrogate_q025": -1.7977667905614652,
+     "surrogate_q975": 1.5995270040559713
     },
     {
      "id": "lyap_raw",
      "name": "Lyapunov, raw returns",
-     "statistic": 0.07323594556591131,
-     "p_value": 0.37,
-     "p_holm": 0.74,
+     "statistic": 0.07323589584561872,
+     "p_value": 0.39,
+     "p_holm": 0.78,
      "reject": false,
      "direction": "below",
-     "surrogate_median": 0.0742108548638057,
-     "surrogate_q025": 0.07173066053395202,
-     "surrogate_q975": 0.07656144542742793
+     "surrogate_median": 0.07420671281672343,
+     "surrogate_q025": 0.07160131846197193,
+     "surrogate_q975": 0.07638636308355774
     },
     {
      "id": "lyap_resid",
      "name": "Lyapunov, GARCH residuals",
-     "statistic": 0.07564227649451609,
-     "p_value": 0.21,
-     "p_holm": 0.63,
+     "statistic": 0.07564216655843675,
+     "p_value": 0.23,
+     "p_holm": 0.6900000000000001,
      "reject": false,
      "direction": "above",
-     "surrogate_median": 0.07413806748514178,
-     "surrogate_q025": 0.0718809656742968,
-     "surrogate_q975": 0.0762344179036284
+     "surrogate_median": 0.07409877007245687,
+     "surrogate_q025": 0.07205961418006421,
+     "surrogate_q975": 0.07602638130356236
     }
    ],
-   "seconds": 64.6
+   "seconds": 45.6
   },
   {
    "asset_class": "FX",
@@ -454,7 +454,7 @@
      "surrogate_q975": 0.09735394920233575
     }
    ],
-   "seconds": 62.4
+   "seconds": 41.8
   },
   {
    "asset_class": "FX",
@@ -529,7 +529,7 @@
      "surrogate_q975": 0.10159690822205564
     }
    ],
-   "seconds": 63.0
+   "seconds": 43.4
   },
   {
    "asset_class": "FX",
@@ -604,7 +604,7 @@
      "surrogate_q975": 0.10200711266847214
     }
    ],
-   "seconds": 61.7
+   "seconds": 46.0
   },
   {
    "asset_class": "Crypto",
@@ -679,7 +679,7 @@
      "surrogate_q975": 0.10278285047497628
     }
    ],
-   "seconds": 50.1
+   "seconds": 40.5
   },
   {
    "asset_class": "Crypto",
@@ -754,7 +754,7 @@
      "surrogate_q975": 0.09017646243976368
     }
    ],
-   "seconds": 49.6
+   "seconds": 41.0
   },
   {
    "asset_class": "Commodities and rates",
@@ -829,7 +829,7 @@
      "surrogate_q975": 0.10230215121094913
     }
    ],
-   "seconds": 48.2
+   "seconds": 40.0
   },
   {
    "asset_class": "Commodities and rates",
@@ -904,7 +904,7 @@
      "surrogate_q975": 0.13131884706182434
     }
    ],
-   "seconds": 46.3
+   "seconds": 39.7
   },
   {
    "asset_class": "Commodities and rates",
@@ -979,7 +979,7 @@
      "surrogate_q975": 0.10169595451965496
     }
    ],
-   "seconds": 48.6
+   "seconds": 39.7
   },
   {
    "asset_class": "Private markets",
@@ -995,12 +995,12 @@
     "m": 4
    },
    "garch": {
-    "mu": 0.0005134979303562622,
-    "omega": 5.586730779683335e-06,
-    "alpha": 0.07157389314887933,
-    "beta": 0.9008552647612754,
-    "nu": 7.704503389880294,
-    "persistence": 0.9724291579101547
+    "mu": 0.0005134968482095948,
+    "omega": 5.5867459256687205e-06,
+    "alpha": 0.07157399938662545,
+    "beta": 0.900855124635085,
+    "nu": 7.704523916127236,
+    "persistence": 0.9724291240217104
    },
    "overall": "Nonlinear dependence is present in the raw series but disappears after GARCH(1,1) filtering: the structure is volatility clustering, not predictable dynamics in the mean.",
    "overall_reject": true,
@@ -1008,53 +1008,53 @@
     {
      "id": "bds_raw",
      "name": "BDS, raw returns",
-     "statistic": 7.557860500765273,
+     "statistic": 7.559210708771225,
      "p_value": 0.005,
      "p_holm": 0.02,
      "reject": true,
      "direction": "above",
-     "surrogate_median": -0.11935284328512899,
-     "surrogate_q025": -1.7982949376396946,
-     "surrogate_q975": 1.4884252088492098
+     "surrogate_median": -0.1317297296845532,
+     "surrogate_q025": -1.787094521884578,
+     "surrogate_q975": 1.4620104492800197
     },
     {
      "id": "bds_resid",
      "name": "BDS, GARCH residuals",
-     "statistic": -0.05053839758703087,
-     "p_value": 0.94,
+     "statistic": -0.05077579142830191,
+     "p_value": 0.945,
      "p_holm": 1.0,
      "reject": false,
      "direction": "above",
-     "surrogate_median": -0.11988383805389743,
-     "surrogate_q025": -1.8803766548865097,
-     "surrogate_q975": 1.760947845301819
+     "surrogate_median": -0.13279755170465724,
+     "surrogate_q025": -1.8651736904488614,
+     "surrogate_q975": 1.7403853433645586
     },
     {
      "id": "lyap_raw",
      "name": "Lyapunov, raw returns",
-     "statistic": 0.098644162979232,
-     "p_value": 0.72,
+     "statistic": 0.09864395179727338,
+     "p_value": 0.68,
      "p_holm": 1.0,
      "reject": false,
      "direction": "below",
-     "surrogate_median": 0.09917566243582035,
-     "surrogate_q025": 0.09691424277474044,
-     "surrogate_q975": 0.10169007347693232
+     "surrogate_median": 0.09924419187020907,
+     "surrogate_q025": 0.09660123872940694,
+     "surrogate_q975": 0.10144614225399189
     },
     {
      "id": "lyap_resid",
      "name": "Lyapunov, GARCH residuals",
-     "statistic": 0.09926327056151861,
-     "p_value": 0.985,
+     "statistic": 0.09926327001736636,
+     "p_value": 0.935,
      "p_holm": 1.0,
      "reject": false,
      "direction": "below",
-     "surrogate_median": 0.0992832270546123,
-     "surrogate_q025": 0.09663092817070347,
-     "surrogate_q975": 0.10186431336381413
+     "surrogate_median": 0.09935208639774538,
+     "surrogate_q025": 0.09652624754878238,
+     "surrogate_q975": 0.10175593417665148
     }
    ],
-   "seconds": 46.6
+   "seconds": 39.3
   }
  ]
 }
