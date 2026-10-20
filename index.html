@@ -262,7 +262,7 @@ footer { border-top: 1px solid var(--rule); margin-top: 40px; padding-top: 14px;
       <li>Series mode reports an overall verdict after Holm correction across its four tests.</li>
       <li>Strategy mode compares the annualised Sharpe ratio with two nulls: the same positions on IAAFT surrogates of the returns, and the positions shuffled in time. It also reports the deflated Sharpe ratio (Bailey &amp; López de Prado, 2014), with the cross-trial Sharpe variance estimated from the permutation null.</li>
     </ol>
-    <p class="note" style="font-family:var(--sans)">Validation on known processes: Gaussian white noise rejects in 2% of 50 runs, simulated GARCH(1,1) data rejects on raw BDS in 20 of 20 runs and on residual BDS in none, and the Lorenz system rejects on all four tests.</p>
+    <p class="note" style="font-family:var(--sans)">Validation on known processes: Gaussian white noise rejects in 2% of 50 runs, simulated GARCH(1,1) data rejects on raw BDS in 20 of 20 runs and on residual BDS in none, and the Lorenz system is rejected overall in 10 of 10 trajectories (raw BDS and both Lyapunov tests every time; BDS on GARCH residuals in 5 of 10, since a volatility model is not meaningful for a deterministic system).</p>
 
     <h3>References</h3>
     <ul class="refs">
@@ -394,7 +394,7 @@ self.onmessage = (ev) => {
 "use strict";
 
 const PYODIDE_URL = "https://cdn.jsdelivr.net/pyodide/v0.27.7/full/";
-const APP_VERSION = "1.1.0";
+const APP_VERSION = "1.1.1";
 const MIN_ROWS = 500, MAX_ROWS = 5000;
 
 const $ = (s) => document.querySelector(s);
@@ -503,7 +503,7 @@ function showErrors(list, warns = [], head = "The file cannot be used:", notes =
   $("#messages").innerHTML =
     (notes.length ? `<p class="note">${notes.map(esc).join(" ")}</p>` : "") +
     (list.length ? `<div class="errors"><p>${esc(head)}</p><ul>${list.map((e) => `<li>${esc(e)}</li>`).join("")}</ul></div>` : "") +
-    warns.map((w) => `<p class="warn">${esc(w)}</p>`).join("");
+    warns.map((w) => `<p class="${w.startsWith("Check the data") ? "errors" : "warn"}">${esc(w)}</p>`).join("");
 }
 
 /* ---------------- file reading ----------------
@@ -771,8 +771,25 @@ function interpretRows(rows, mode, meta = {}) {
   }
   if (!errors.length) {
     if (n > MAX_ROWS) warns.push(`${n} returns. Only the most recent ${MAX_ROWS} will be used, to keep run time bounded.`);
+    // guard against confidently testing the wrong series: real period
+    // returns have |lag-1 autocorrelation| well below 0.3
+    const mean = r.reduce((s, x) => s + x, 0) / n;
+    let num = 0, den = 0;
+    for (let i = 0; i < n; i++) { den += (r[i] - mean) ** 2; if (i) num += (r[i] - mean) * (r[i - 1] - mean); }
+    const ac1 = den > 0 ? num / den : 0;
+    let shapeWarn = false;
+    if (ac1 > 0.8) {
+      shapeWarn = true;
+      warns.push(`Check the data: the returns have lag-1 autocorrelation ${ac1.toFixed(2)}, which period returns almost never have. ` +
+        (iRet >= 0 ? `"${header[iRet]}" may hold cumulative returns or a price level. If so, supply period returns, or name the column "Close" or "Price" so returns are computed.`
+                   : `The prices may be too smooth to be market prices.`) +
+        " Results would describe that series, not the asset's returns. (Deterministic test series such as Lorenz are legitimately this smooth.)");
+    } else if (iPx >= 0 && ac1 < -0.3) {
+      shapeWarn = true;
+      warns.push(`Check the data: the returns computed from "${header[iPx]}" have lag-1 autocorrelation ${ac1.toFixed(2)}, the signature of differencing a series that is already a return or growth factor (for example 1.01, 0.99). If "${header[iPx]}" holds returns or growth factors, not prices, rename it "return" (subtract 1 from growth factors first). Results would otherwise be meaningless.`);
+    }
     const medAbs = r.map(Math.abs).sort((a, b) => a - b)[Math.floor(n / 2)];
-    if (!pctSeen && medAbs > 0.1) warns.push("Returns look like they are in percent (median absolute value above 0.1). The tests are scale-free, so results are unaffected, but check the column.");
+    if (!pctSeen && !shapeWarn && medAbs > 0.1) warns.push("Returns look like they are in percent (median absolute value above 0.1). The tests are scale-free, so results are unaffected, but check the column.");
   }
   return { errors, warns, notes, data, n };
 }
@@ -897,6 +914,7 @@ function onResult(json) {
   lastResult = res;
   lastResult.elapsed = (Date.now() - runStart) / 1000;
   lastResult.source = parsed.name;
+  lastResult.inputWarnings = (parsed.check.warns || []).filter((w) => w.startsWith("Check the data"));
   stageState = { current: "done", detail: "", frac: 1 };
   renderStatus();
   const t = lastResult.elapsed;
@@ -1044,6 +1062,7 @@ function resultsHTML(res, chartWidth) {
   h += `<p class="meta">${esc(res.source || "")} · <span class="num">${res.n_obs}</span> observations, ${esc(res.start)} to ${esc(res.end)} · <span class="num">${res.n_surrogates}</span> IAAFT surrogates, seed ${res.seed}`;
   if (isSeries) h += ` · AR(<span class="num">${res.params.ar_order}</span>) prewhitening · τ = <span class="num">${res.params.tau}</span>${res.params.tau_auto ? " (auto)" : ""}, m = <span class="num">${res.params.m}</span>${res.params.m_auto ? " (auto)" : ""}`;
   h += `</p>`;
+  (res.inputWarnings || []).forEach((w) => (h += `<p class="errors">${esc(w)}</p>`));
   (res.warnings || []).forEach((w) => (h += `<p class="warn">${esc(w)}</p>`));
 
   h += `<div class="overall"><div class="tag">Overall · ${esc(res.overall.method)}</div><p class="verdict" style="margin:6px 0 0">${esc(res.overall.verdict)}</p></div>`;

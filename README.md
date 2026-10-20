@@ -79,7 +79,7 @@ Measured with `python -m pytest tests -s` (199 surrogates, seeded).
 |---|---|---|
 | Gaussian white noise, n = 500 | 50 | Overall false-positive rate (Holm, 5%): **2%**. Per test: BDS raw 4%, BDS residuals 2%, Lyapunov raw 4%, Lyapunov residuals 6%. |
 | GARCH(1,1), ω = 0.05, α = 0.10, β = 0.85, n = 1,000 | 20 | Raw BDS rejects in **100%**. Residual BDS rejects in **0%**. |
-| Lorenz x-component, dt = 0.02, n = 1,000 | 1 | λ = +0.042 per sample. All four tests reject with p = 0.005, the minimum possible. |
+| Lorenz x-component, dt = 0.02, n = 1,000 | 1 (suite) + 10 (random starts) | Suite trajectory: λ = +0.042 per sample, all four tests reject at p = 0.005. Across 10 random starting points: overall rejection **10/10**; raw BDS and both Lyapunov tests 10/10; BDS on GARCH residuals 5/10 (a volatility model is not meaningful for a deterministic system, so that test is not a reliable chaos detector). |
 
 The per-test false-positive rates are all within sampling error of the nominal 5%. With 50 runs, a 95% interval around 5% is roughly 0–11%.
 
@@ -119,6 +119,16 @@ Additional hard cases, 20 runs each at n = 1,000 (overall Holm rejection rate at
 | AR(1), φ = 0.3, linear only | 35% before prewhitening, 10% after | Fixed in 1.1.0 |
 | 40% zero returns (illiquid asset), 40 runs | 0% | Correct; ties do not distort the surrogates |
 | i.i.d. noise whose volatility doubles halfway | 100%, all through raw BDS; residual BDS 0% | Known limitation: a structural break looks like volatility clustering |
+
+## Input safeguards
+
+Checked on the live site (20 October 2026): files with fewer than 500 rows, a date gap, prices in a "return" column, or returns in a "Close" column are rejected with a specific message. Prices are converted, decimal commas and day-first dates are read, and newest-first files are sorted, each reported to the user.
+
+Two inputs that a column-name reader cannot catch are flagged from the data itself, using lag-1 autocorrelation (period returns almost never exceed 0.3 in absolute value):
+- cumulative returns or a price level in a "return" column (autocorrelation near +1);
+- returns or growth factors (1.01, 0.99) in a "Price" or "Close" column, which differencing turns into garbage (autocorrelation near −0.5).
+
+These produce a prominent warning that is repeated in the results and the downloaded report. They warn rather than block because deterministic test series such as Lorenz are legitimately that smooth.
 
 ## Known weaknesses
 
