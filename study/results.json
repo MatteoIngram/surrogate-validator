@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-20",
- "end": "2026-10-19",
+ "generated": "2026-10-24",
+ "end": "2026-10-23",
  "n_obs": 1500,
  "n_surrogates": 199,
  "validate_version": "1.1.0",
@@ -11,8 +11,8 @@
    "name": "S&P 500",
    "ticker": "^GSPC",
    "note": "",
-   "start": "2020-10-28",
-   "end": "2026-10-19",
+   "start": "2020-11-03",
+   "end": "2026-10-23",
    "n_obs": 1500,
    "zero_return_share": 0.0,
    "params": {
@@ -20,12 +20,12 @@
     "m": 4
    },
    "garch": {
-    "mu": 0.0004645014584987505,
-    "omega": 3.170618267556696e-06,
-    "alpha": 0.11497036421095176,
-    "beta": 0.8569178358359895,
-    "nu": 6.83246750533473,
-    "persistence": 0.9718882000469412
+    "mu": 0.0004502800117612984,
+    "omega": 3.085895859705689e-06,
+    "alpha": 0.11287217262446947,
+    "beta": 0.8594744219789094,
+    "nu": 7.02091560794355,
+    "persistence": 0.9723465946033789
    },
    "overall": "Nonlinear dependence is present in the raw series but disappears after GARCH(1,1) filtering: the structure is volatility clustering, not predictable dynamics in the mean.",
    "overall_reject": true,
@@ -33,74 +33,74 @@
     {
      "id": "bds_raw",
      "name": "BDS, raw returns",
-     "statistic": 8.869480456797971,
+     "statistic": 8.770720563366979,
      "p_value": 0.005,
      "p_holm": 0.02,
      "reject": true,
      "direction": "above",
-     "surrogate_median": -0.010335822355581656,
-     "surrogate_q025": -1.8838520313860514,
-     "surrogate_q975": 1.8374670743836523
+     "surrogate_median": 0.077385676704703,
+     "surrogate_q025": -1.7178818175671038,
+     "surrogate_q975": 1.8202377462713952
     },
     {
      "id": "bds_resid",
      "name": "BDS, GARCH residuals",
-     "statistic": -0.8167386125874339,
-     "p_value": 0.515,
-     "p_holm": 0.96,
+     "statistic": -0.7572259183701471,
+     "p_value": 0.605,
+     "p_holm": 0.79,
      "reject": false,
      "direction": "below",
-     "surrogate_median": -0.2213484206969664,
-     "surrogate_q025": -1.9597662977274743,
-     "surrogate_q975": 1.7460144740729573
+     "surrogate_median": -0.1400800933521976,
+     "surrogate_q025": -1.7261077925706168,
+     "surrogate_q975": 2.0410844999632607
     },
     {
      "id": "lyap_raw",
      "name": "Lyapunov, raw returns",
-     "statistic": 0.12537286470907708,
-     "p_value": 0.03,
-     "p_holm": 0.09,
-     "reject": true,
+     "statistic": 0.12614365205395622,
+     "p_value": 0.1,
+     "p_holm": 0.30000000000000004,
+     "reject": false,
      "direction": "below",
-     "surrogate_median": 0.12891307631616156,
-     "surrogate_q025": 0.12603267406811147,
-     "surrogate_q975": 0.13200268128180995
+     "surrogate_median": 0.12856703077911372,
+     "surrogate_q025": 0.12596120302795266,
+     "surrogate_q975": 0.13171817389398371
     },
     {
      "id": "lyap_resid",
      "name": "Lyapunov, GARCH residuals",
-     "statistic": 0.12771327597078055,
-     "p_value": 0.48,
-     "p_holm": 0.96,
+     "statistic": 0.12765058401195026,
+     "p_value": 0.395,
+     "p_holm": 0.79,
      "reject": false,
      "direction": "below",
-     "surrogate_median": 0.12869028458293522,
-     "surrogate_q025": 0.12641044099101384,
-     "surrogate_q975": 0.13145482346168375
+     "surrogate_median": 0.12885207810646765,
+     "surrogate_q025": 0.12551004153662818,
+     "surrogate_q975": 0.13165358737004446
     }
    ],
-   "seconds": 39.2
+   "seconds": 70.5
   },
   {
    "asset_class": "Equity indices",
    "name": "FTSE 100",
    "ticker": "^FTSE",
    "note": "",
-   "start": "2020-11-06",
-   "end": "2026-10-19",
+   "start": "2020-11-12",
+   "end": "2026-10-23",
    "n_obs": 1500,
    "zero_return_share": 0.0006666666666666666,
    "params": {
-    "tau": 6,
+    "tau": 2,
     "m": 4
    },
    "garch": {
-    "mu": 0.00022272156961593647,
-    "omega": 1.0756243989913902e-05,
-    "alpha": 0.17913801260078824,
-    "beta": 0.6627440551186204,
-    "nu": 4.431194073575909,
-    "persistence": 0.8418820677194087
+    "mu": 0.00025758359251889536,
+    "omega": 1.0802351225431217e-05,
+    "alpha": 0.18058100684709116,
+    "beta": 0.6552703217914374,
+    "nu": 4.606247545778271,
+    "persistence": 0.8358513286385285
    },
    "overall": "Nonlinear dependence is present in the raw series but disappears after GARCH(1,1) filtering: the structure is volatility clustering, not predictable dynamics in the mean.",
    "overall_reject": true,
@@ -108,61 +108,61 @@
     {
      "id": "bds_raw",
      "name": "BDS, raw returns",
-     "statistic": 9.606269222749475,
+     "statistic": 9.392525428493446,
      "p_value": 0.005,
      "p_holm": 0.02,
      "reject": true,
      "direction": "above",
-     "surrogate_median": -0.08576465811865475,
-     "surrogate_q025": -1.765924198865832,
-     "surrogate_q975": 1.8123616641087252
+     "surrogate_median": 0.17728235298887135,
+     "surrogate_q025": -2.021912015082667,
+     "surrogate_q975": 1.9127711718765035
     },
     {
      "id": "bds_resid",
      "name": "BDS, GARCH residuals",
-     "statistic": 0.3949203428432659,
-     "p_value": 0.57,
-     "p_holm": 0.57,
+     "statistic": 0.19715693484678437,
+     "p_value": 0.76,
+     "p_holm": 1.0,
      "reject": false,
      "direction": "above",
-     "surrogate_median": -0.1261862291152255,
-     "surrogate_q025": -1.7842890656546373,
-     "surrogate_q975": 1.9381705612942302
+     "surrogate_median": -0.12339923883371462,
+     "surrogate_q025": -2.0251585010523687,
+     "surrogate_q975": 1.6837850039857165
     },
     {
      "id": "lyap_raw",
      "name": "Lyapunov, raw returns",
-     "statistic": 0.08138272103412361,
-     "p_value": 0.005,
-     "p_holm": 0.02,
-     "reject": true,
+     "statistic": 0.12928937459005332,
+     "p_value": 0.98,
+     "p_holm": 1.0,
+     "reject": false,
      "direction": "below",
-     "surrogate_median": 0.084529794527767,
-     "surrogate_q025": 0.08267668124907998,
-     "surrogate_q975": 0.08644413457299326
+     "surrogate_median": 0.1293834813486273,
+     "surrogate_q025": 0.12611216216409663,
+     "surrogate_q975": 0.13201538920975234
     },
     {
      "id": "lyap_resid",
      "name": "Lyapunov, GARCH residuals",
-     "statistic": 0.08308404944389286,
-     "p_value": 0.19,
-     "p_holm": 0.38,
+     "statistic": 0.12938756067770635,
+     "p_value": 0.705,
+     "p_holm": 1.0,
      "reject": false,
-     "direction": "below",
-     "surrogate_median": 0.08432958722127848,
-     "surrogate_q025": 0.08277688941229708,
-     "surrogate_q975": 0.08633163171225978
+     "direction": "above",
+     "surrogate_median": 0.12882615417545376,
+     "surrogate_q025": 0.12582651150006235,
+     "surrogate_q975": 0.13161533488611266
     }
    ],
-   "seconds": 39.2
+   "seconds": 72.4
   },
   {
    "asset_class": "Equity indices",
    "name": "Euro Stoxx 50",
    "ticker": "^STOXX50E",
    "note": "",
-   "start": "2020-11-02",
-   "end": "2026-10-19",
+   "start": "2020-11-06",
+   "end": "2026-10-23",
    "n_obs": 1500,
    "zero_return_share": 0.0,
    "params": {
@@ -170,12 +170,12 @@
     "m": 4
    },
    "garch": {
-    "mu": 0.00039294417795730866,
-    "omega": 1.1667802883362212e-05,
-    "alpha": 0.16934301849951844,
-    "beta": 0.7361443108443205,
-    "nu": 5.37587459667291,
-    "persistence": 0.905487329343839
+    "mu": 0.00043595566991039633,
+    "omega": 1.1606187092371217e-05,
+    "alpha": 0.16111929549602236,
+    "beta": 0.7447559940001551,
+    "nu": 5.216154546188784,
+    "persistence": 0.9058752894961775
    },
    "overall": "Nonlinear dependence is present in the raw series but disappears after GARCH(1,1) filtering: the structure is volatility clustering, not predictable dynamics in the mean.",
    "overall_reject": true,
@@ -183,61 +183,61 @@
     {
      "id": "bds_raw",
      "name": "BDS, raw returns",
-     "statistic": 9.008803676992024,
+     "statistic": 8.961024133858867,
      "p_value": 0.005,
      "p_holm": 0.02,
      "reject": true,
      "direction": "above",
-     "surrogate_median": 0.15577104222986937,
-     "surrogate_q025": -1.815259163136796,
-     "surrogate_q975": 1.7094979005817037
+     "surrogate_median": 0.09467925262011524,
+     "surrogate_q025": -1.6350036083897397,
+     "surrogate_q975": 1.7616913855631604
     },
     {
      "id": "bds_resid",
      "name": "BDS, GARCH residuals",
-     "statistic": -0.059761185150416604,
-     "p_value": 0.96,
+     "statistic": 0.2407101796703576,
+     "p_value": 0.91,
      "p_holm": 1.0,
      "reject": false,
-     "direction": "below",
-     "surrogate_median": 0.029944466343466678,
-     "surrogate_q025": -1.4923415759728655,
-     "surrogate_q975": 1.8588971669621623
+     "direction": "above",
+     "surrogate_median": 0.13386789070239735,
+     "surrogate_q025": -2.100166645717678,
+     "surrogate_q975": 2.081308103654108
     },
     {
      "id": "lyap_raw",
      "name": "Lyapunov, raw returns",
-     "statistic": 0.12637421428199055,
-     "p_value": 0.165,
-     "p_holm": 0.495,
+     "statistic": 0.1270454775616435,
+     "p_value": 0.305,
+     "p_holm": 0.915,
      "reject": false,
      "direction": "below",
-     "surrogate_median": 0.1287635917501775,
-     "surrogate_q025": 0.1253298622052264,
-     "surrogate_q975": 0.13215087836162026
+     "surrogate_median": 0.12857264087682754,
+     "surrogate_q025": 0.12537492675187664,
+     "surrogate_q975": 0.13199909690632156
     },
     {
      "id": "lyap_resid",
      "name": "Lyapunov, GARCH residuals",
-     "statistic": 0.12888951252724654,
-     "p_value": 0.69,
+     "statistic": 0.12868643376143785,
+     "p_value": 0.785,
      "p_holm": 1.0,
      "reject": false,
      "direction": "above",
-     "surrogate_median": 0.12829183164784652,
-     "surrogate_q025": 0.12565174277540528,
-     "surrogate_q975": 0.1310099177603639
+     "surrogate_median": 0.12828388744082234,
+     "surrogate_q025": 0.12531167533062082,
+     "surrogate_q975": 0.13127608806752966
     }
    ],
-   "seconds": 39.2
+   "seconds": 71.8
   },
   {
    "asset_class": "Equity indices",
    "name": "Nikkei 225",
    "ticker": "^N225",
    "note": "",
-   "start": "2020-08-27",
-   "end": "2026-10-19",
+   "start": "2020-09-02",
+   "end": "2026-10-23",
    "n_obs": 1500,
    "zero_return_share": 0.0,
    "params": {
@@ -245,12 +245,12 @@
     "m": 4
    },
    "garch": {
-    "mu": 0.0002178511356786163,
-    "omega": 2.1089883642517624e-05,
-    "alpha": 0.14727457452067522,
-    "beta": 0.7429626345959925,
-    "nu": 6.39811965717944,
-    "persistence": 0.8902372091166677
+    "mu": 0.00022967287758676172,
+    "omega": 2.103932562076615e-05,
+    "alpha": 0.14677474353544218,
+    "beta": 0.7440972731160257,
+    "nu": 6.378698026989804,
+    "persistence": 0.8908720166514679
    },
    "overall": "Nonlinear dependence is present in the raw series but disappears after GARCH(1,1) filtering: the structure is volatility clustering, not predictable dynamics in the mean.",
    "overall_reject": true,
@@ -258,61 +258,61 @@
     {
      "id": "bds_raw",
      "name": "BDS, raw returns",
-     "statistic": 8.029334931977537,
+     "statistic": 8.009377039278576,
      "p_value": 0.005,
      "p_holm": 0.02,
      "reject": true,
      "direction": "above",
-     "surrogate_median": 0.07978937947437269,
-     "surrogate_q025": -1.4508682632254515,
-     "surrogate_q975": 2.0001135045410745
+     "surrogate_median": 0.10773157021997642,
+     "surrogate_q025": -1.7030304552878517,
+     "surrogate_q975": 2.3614998658656727
     },
     {
      "id": "bds_resid",
      "name": "BDS, GARCH residuals",
-     "statistic": 0.10718565270449527,
-     "p_value": 0.77,
+     "statistic": 0.11264048599633383,
+     "p_value": 0.855,
      "p_holm": 1.0,
      "reject": false,
      "direction": "above",
-     "surrogate_median": -0.15695975905110132,
-     "surrogate_q025": -2.2914502354599446,
-     "surrogate_q975": 1.8445533207748606
+     "surrogate_median": -0.0936151254922267,
+     "surrogate_q025": -1.93736771305045,
+     "surrogate_q975": 1.8675893637686172
     },
     {
      "id": "lyap_raw",
      "name": "Lyapunov, raw returns",
-     "statistic": 0.12880718857099055,
-     "p_value": 0.805,
+     "statistic": 0.1289921340259981,
+     "p_value": 0.75,
      "p_holm": 1.0,
      "reject": false,
      "direction": "above",
-     "surrogate_median": 0.12847889416566857,
-     "surrogate_q025": 0.12568233933181633,
-     "surrogate_q975": 0.13172726335043433
+     "surrogate_median": 0.12857607588671327,
+     "surrogate_q025": 0.12546533139062097,
+     "surrogate_q975": 0.1315468658983719
     },
     {
      "id": "lyap_resid",
      "name": "Lyapunov, GARCH residuals",
-     "statistic": 0.13000557738478993,
-     "p_value": 0.22,
-     "p_holm": 0.66,
+     "statistic": 0.12999221084210125,
+     "p_value": 0.235,
+     "p_holm": 0.705,
      "reject": false,
      "direction": "above",
-     "surrogate_median": 0.12785147636112423,
-     "surrogate_q025": 0.1249048825097879,
-     "surrogate_q975": 0.13081240768869273
+     "surrogate_median": 0.12812014460608914,
+     "surrogate_q025": 0.12469258365231335,
+     "surrogate_q975": 0.13122098070892227
     }
    ],
-   "seconds": 39.2
+   "seconds": 70.8
   },
   {
    "asset_class": "Equity indices",
    "name": "MSCI Emerging Markets",
    "ticker": "EEM",
    "note": "iShares ETF used as proxy for the index",
-   "start": "2020-10-28",
-   "end": "2026-10-19",
+   "start": "2020-11-03",
+   "end": "2026-10-23",
    "n_obs": 1500,
    "zero_return_share": 0.004666666666666667,
    "params": {
@@ -320,12 +320,12 @@
     "m": 5
    },
    "garch": {
-    "mu": 0.00020763294939205826,
-    "omega": 4.852088877913426e-06,
-    "alpha": 0.07125465138801572,
-    "beta": 0.8973303163949927,
-    "nu": 7.076053988385172,
-    "persistence": 0.9685849677830084
+    "mu": 0.00021377723034250918,
+    "omega": 4.752286537913635e-06,
+    "alpha": 0.06988394989211252,
+    "beta": 0.899695597580047,
+    "nu": 6.905878619279562,
+    "persistence": 0.9695795474721596
    },
    "overall": "Nonlinear dependence is present in the raw series but disappears after GARCH(1,1) filtering: the structure is volatility clustering, not predictable dynamics in the mean.",
    "overall_reject": true,
@@ -333,61 +333,61 @@
     {
      "id": "bds_raw",
      "name": "BDS, raw returns",
-     "statistic": 5.184150829591891,
+     "statistic": 5.129563137857841,
      "p_value": 0.005,
      "p_holm": 0.02,
      "reject": true,
      "direction": "above",
-     "surrogate_median": 0.0506225542817908,
-     "surrogate_q025": -1.7603893989124557,
-     "surrogate_q975": 1.5449159437661026
+     "surrogate_median": 0.11206163692908028,
+     "surrogate_q025": -1.464136328309072,
+     "surrogate_q975": 1.9137221704267688
     },
     {
      "id": "bds_resid",
      "name": "BDS, GARCH residuals",
-     "statistic": -0.9468113238329937,
-     "p_value": 0.39,
-     "p_holm": 0.66,
+     "statistic": -0.8882088487050112,
+     "p_value": 0.4,
+     "p_holm": 0.64,
      "reject": false,
      "direction": "below",
-     "surrogate_median": -0.2216717745777217,
-     "surrogate_q025": -1.7813972538865903,
-     "surrogate_q975": 1.8470582942269866
+     "surrogate_median": -0.12666313608039642,
+     "surrogate_q025": -1.776467836022548,
+     "surrogate_q975": 1.9150459424044586
     },
     {
      "id": "lyap_raw",
      "name": "Lyapunov, raw returns",
-     "statistic": 0.07323912514320406,
-     "p_value": 0.33,
-     "p_holm": 0.66,
+     "statistic": 0.07318943744443986,
+     "p_value": 0.32,
+     "p_holm": 0.64,
      "reject": false,
      "direction": "below",
-     "surrogate_median": 0.07429404258732893,
-     "surrogate_q025": 0.07167894082590003,
-     "surrogate_q975": 0.07645586245721818
+     "surrogate_median": 0.07436134032906087,
+     "surrogate_q025": 0.0722538378082539,
+     "surrogate_q975": 0.07639265000133173
     },
     {
      "id": "lyap_resid",
      "name": "Lyapunov, GARCH residuals",
-     "statistic": 0.07571364008431328,
-     "p_value": 0.12,
-     "p_holm": 0.36,
+     "statistic": 0.07565865192447079,
+     "p_value": 0.155,
+     "p_holm": 0.46499999999999997,
      "reject": false,
      "direction": "above",
-     "surrogate_median": 0.07392062421757634,
-     "surrogate_q025": 0.07196615978091657,
-     "surrogate_q975": 0.07610123294802892
+     "surrogate_median": 0.07392560763039359,
+     "surrogate_q025": 0.07143117182820757,
+     "surrogate_q975": 0.0763573383494172
     }
    ],
-   "seconds": 38.8
+   "seconds": 71.0
   },
   {
    "asset_class": "FX",
    "name": "EUR/USD",
    "ticker": "EURUSD=X",
    "note": "",
-   "start": "2021-01-12",
-   "end": "2026-10-19",
+   "start": "2021-01-18",
+   "end": "2026-10-23",
    "n_obs": 1500,
    "zero_return_share": 0.0026666666666666666,
    "params": {
@@ -395,12 +395,12 @@
     "m": 4
    },
    "garch": {
-    "mu": -6.489540021532455e-05,
-    "omega": 1.3076011850411395e-07,
-    "alpha": 0.04025207329643019,
-    "beta": 0.9543541644474848,
-    "nu": 6.567425333001372,
-    "persistence": 0.994606237743915
+    "mu": -6.706807704355612e-05,
+    "omega": 1.202196527296542e-07,
+    "alpha": 0.04022716163760137,
+    "beta": 0.9548717665942874,
+    "nu": 6.5203949642125,
+    "persistence": 0.9950989282318887
    },
    "overall": "Nonlinear dependence is present in the raw series but disappears after GARCH(1,1) filtering: the structure is volatility clustering, not predictable dynamics in the mean.",
    "overall_reject": true,
@@ -408,61 +408,61 @@
     {
      "id": "bds_raw",
      "name": "BDS, raw returns",
-     "statistic": 6.723060033092823,
+     "statistic": 6.7579530832024,
      "p_value": 0.005,
      "p_holm": 0.02,
      "reject": true,
      "direction": "above",
-     "surrogate_median": -0.14640889853696465,
-     "surrogate_q025": -1.4756865904653875,
-     "surrogate_q975": 1.9078764660823475
+     "surrogate_median": 0.04020169213829337,
+     "surrogate_q025": -1.5043846740195788,
+     "surrogate_q975": 1.890470793738216
     },
     {
      "id": "bds_resid",
      "name": "BDS, GARCH residuals",
-     "statistic": 0.017485685449264203,
-     "p_value": 0.985,
+     "statistic": 0.06627567831257067,
+     "p_value": 0.755,
      "p_holm": 1.0,
      "reject": false,
      "direction": "above",
-     "surrogate_median": 0.01295656379732918,
-     "surrogate_q025": -1.8005246443536551,
-     "surrogate_q975": 1.8153227392600222
+     "surrogate_median": -0.25784425785424253,
+     "surrogate_q025": -1.9962148468858891,
+     "surrogate_q975": 1.9058748788632307
     },
     {
      "id": "lyap_raw",
      "name": "Lyapunov, raw returns",
-     "statistic": 0.09528121192887036,
-     "p_value": 0.98,
+     "statistic": 0.09548588596084083,
+     "p_value": 0.845,
      "p_holm": 1.0,
      "reject": false,
      "direction": "above",
-     "surrogate_median": 0.09526139787280777,
-     "surrogate_q025": 0.0932947514593262,
-     "surrogate_q975": 0.09730917240417034
+     "surrogate_median": 0.09530186469385565,
+     "surrogate_q025": 0.0933264846863313,
+     "surrogate_q975": 0.09732986471648221
     },
     {
      "id": "lyap_resid",
      "name": "Lyapunov, GARCH residuals",
-     "statistic": 0.09661276267605926,
-     "p_value": 0.18,
-     "p_holm": 0.54,
+     "statistic": 0.09685699242520009,
+     "p_value": 0.105,
+     "p_holm": 0.315,
      "reject": false,
      "direction": "above",
-     "surrogate_median": 0.09526544193680078,
-     "surrogate_q025": 0.09347493388770008,
-     "surrogate_q975": 0.09736282816968728
+     "surrogate_median": 0.0951362745715118,
+     "surrogate_q025": 0.09295035616332324,
+     "surrogate_q975": 0.0971009557172446
     }
    ],
-   "seconds": 38.1
+   "seconds": 70.0
   },
   {
    "asset_class": "FX",
    "name": "GBP/USD",
    "ticker": "GBPUSD=X",
    "note": "",
-   "start": "2021-01-12",
-   "end": "2026-10-19",
+   "start": "2021-01-18",
+   "end": "2026-10-23",
    "n_obs": 1500,
    "zero_return_share": 0.0006666666666666666,
    "params": {
@@ -470,12 +470,12 @@
     "m": 4
    },
    "garch": {
-    "mu": 3.0983410867860355e-05,
-    "omega": 3.117364719596481e-07,
-    "alpha": 0.039378104683077744,
-    "beta": 0.9475001882694118,
-    "nu": 8.211397199587628,
-    "persistence": 0.9868782929524896
+    "mu": 3.3610899096870866e-05,
+    "omega": 3.0685928187336235e-07,
+    "alpha": 0.03962004826965084,
+    "beta": 0.9474854135991619,
+    "nu": 8.254676385230104,
+    "persistence": 0.9871054618688128
    },
    "overall": "Nonlinear dependence is present in the raw series but disappears after GARCH(1,1) filtering: the structure is volatility clustering, not predictable dynamics in the mean.",
    "overall_reject": true,
@@ -483,61 +483,61 @@
     {
      "id": "bds_raw",
      "name": "BDS, raw returns",
-     "statistic": 7.888060795284076,
+     "statistic": 7.970447619365723,
      "p_value": 0.005,
      "p_holm": 0.02,
      "reject": true,
      "direction": "above",
-     "surrogate_median": 0.014565613081164192,
-     "surrogate_q025": -1.6233854084306198,
-     "surrogate_q975": 2.035437927185347
+     "surrogate_median": 0.004502380016798594,
+     "surrogate_q025": -1.6729045093127726,
+     "surrogate_q975": 1.6933880156701386
     },
     {
      "id": "bds_resid",
      "name": "BDS, GARCH residuals",
-     "statistic": 0.6730352999604865,
-     "p_value": 0.365,
-     "p_holm": 0.73,
+     "statistic": 0.6281693409325864,
+     "p_value": 0.47,
+     "p_holm": 0.94,
      "reject": false,
      "direction": "above",
-     "surrogate_median": -0.19432003944447154,
-     "surrogate_q025": -1.8004633798327037,
-     "surrogate_q975": 1.7378372679620928
+     "surrogate_median": -0.07357330818348498,
+     "surrogate_q025": -2.027164814591418,
+     "surrogate_q975": 1.7933679822590172
     },
     {
      "id": "lyap_raw",
      "name": "Lyapunov, raw returns",
-     "statistic": 0.09689515030241408,
-     "p_value": 0.13,
-     "p_holm": 0.39,
+     "statistic": 0.09736494108421495,
+     "p_value": 0.225,
+     "p_holm": 0.675,
      "reject": false,
      "direction": "below",
-     "surrogate_median": 0.09895783387042782,
-     "surrogate_q025": 0.09605562532747108,
-     "surrogate_q975": 0.10114875114524892
+     "surrogate_median": 0.09896327484853781,
+     "surrogate_q025": 0.09645083925325969,
+     "surrogate_q975": 0.1013948447434004
     },
     {
      "id": "lyap_resid",
      "name": "Lyapunov, GARCH residuals",
-     "statistic": 0.09865868416952306,
-     "p_value": 0.755,
-     "p_holm": 0.755,
+     "statistic": 0.09916330241603455,
+     "p_value": 0.9,
+     "p_holm": 0.94,
      "reject": false,
-     "direction": "below",
-     "surrogate_median": 0.09907597544198078,
-     "surrogate_q025": 0.09680720039561076,
-     "surrogate_q975": 0.10147941493086207
+     "direction": "above",
+     "surrogate_median": 0.09898669883352688,
+     "surrogate_q025": 0.09660263239236735,
+     "surrogate_q975": 0.1014436930738057
     }
    ],
-   "seconds": 38.6
+   "seconds": 70.1
   },
   {
    "asset_class": "FX",
    "name": "USD/JPY",
    "ticker": "JPY=X",
    "note": "",
-   "start": "2021-01-12",
-   "end": "2026-10-19",
+   "start": "2021-01-18",
+   "end": "2026-10-23",
    "n_obs": 1500,
    "zero_return_share": 0.002,
    "params": {
@@ -545,12 +545,12 @@
     "m": 4
    },
    "garch": {
-    "mu": 0.0002119962892716648,
-    "omega": 5.287317550291076e-07,
-    "alpha": 0.09046044147190717,
-    "beta": 0.9039731204561363,
-    "nu": 4.493188128653889,
-    "persistence": 0.9944335619280434
+    "mu": 0.00021109659060321951,
+    "omega": 4.944007270295113e-07,
+    "alpha": 0.08441425003409068,
+    "beta": 0.9099719302348077,
+    "nu": 4.513562909573877,
+    "persistence": 0.9943861802688984
    },
    "overall": "Nonlinear dependence is present in the raw series but disappears after GARCH(1,1) filtering: the structure is volatility clustering, not predictable dynamics in the mean.",
    "overall_reject": true,
@@ -558,61 +558,61 @@
     {
      "id": "bds_raw",
      "name": "BDS, raw returns",
-     "statistic": 8.26167270877566,
+     "statistic": 8.37485591159825,
      "p_value": 0.005,
      "p_holm": 0.02,
      "reject": true,
      "direction": "above",
-     "surrogate_median": -0.08916280147563181,
-     "surrogate_q025": -2.0174009940655786,
-     "surrogate_q975": 1.9087419133914583
+     "surrogate_median": -0.027893286569414595,
+     "surrogate_q025": -1.9851956529168147,
+     "surrogate_q975": 2.033503534218402
     },
     {
      "id": "bds_resid",
      "name": "BDS, GARCH residuals",
-     "statistic": 1.2621461582192812,
-     "p_value": 0.145,
-     "p_holm": 0.43499999999999994,
+     "statistic": 1.702951167058241,
+     "p_value": 0.08,
+     "p_holm": 0.24,
      "reject": false,
      "direction": "above",
-     "surrogate_median": -0.0595538755352743,
-     "surrogate_q025": -1.661361909535371,
-     "surrogate_q975": 1.7423567395785573
+     "surrogate_median": -0.030576924602410432,
+     "surrogate_q025": -1.8131026762209974,
+     "surrogate_q975": 1.9536592805344437
     },
     {
      "id": "lyap_raw",
      "name": "Lyapunov, raw returns",
-     "statistic": 0.09960118419785315,
-     "p_value": 1.0,
+     "statistic": 0.09971377099589346,
+     "p_value": 0.9,
      "p_holm": 1.0,
      "reject": false,
      "direction": "above",
-     "surrogate_median": 0.0995984159886233,
-     "surrogate_q025": 0.09733154789378154,
-     "surrogate_q975": 0.10181273040860024
+     "surrogate_median": 0.09955179454488909,
+     "surrogate_q025": 0.09689562072026589,
+     "surrogate_q975": 0.1019770194198481
     },
     {
      "id": "lyap_resid",
      "name": "Lyapunov, GARCH residuals",
-     "statistic": 0.09988996560547887,
-     "p_value": 0.625,
+     "statistic": 0.10004453543063842,
+     "p_value": 0.615,
      "p_holm": 1.0,
      "reject": false,
      "direction": "above",
-     "surrogate_median": 0.0992555179540239,
-     "surrogate_q025": 0.09651603763858907,
-     "surrogate_q975": 0.10211116893488367
+     "surrogate_median": 0.09930911567549632,
+     "surrogate_q025": 0.09681937770101538,
+     "surrogate_q975": 0.10228525420584199
     }
    ],
-   "seconds": 38.9
+   "seconds": 71.8
   },
   {
    "asset_class": "Crypto",
    "name": "Bitcoin",
    "ticker": "BTC-USD",
    "note": "trades seven days a week",
-   "start": "2022-09-11",
-   "end": "2026-10-19",
+   "start": "2022-09-15",
+   "end": "2026-10-23",
    "n_obs": 1500,
    "zero_return_share": 0.0,
    "params": {
@@ -620,12 +620,12 @@
     "m": 4
    },
    "garch": {
-    "mu": -0.0004516724627026844,
-    "omega": 6.0946280615952596e-05,
-    "alpha": 0.11696425982194412,
-    "beta": 0.8208036948623052,
-    "nu": 3.158430521280308,
-    "persistence": 0.9377679546842493
+    "mu": -0.0004856642055222666,
+    "omega": 6.986326500486371e-05,
+    "alpha": 0.12349041251157618,
+    "beta": 0.7983317104327616,
+    "nu": 3.2373930728849287,
+    "persistence": 0.9218221229443379
    },
    "overall": "Nonlinear dependence is present in the raw series but disappears after GARCH(1,1) filtering: the structure is volatility clustering, not predictable dynamics in the mean.",
    "overall_reject": true,
@@ -633,61 +633,61 @@
     {
      "id": "bds_raw",
      "name": "BDS, raw returns",
-     "statistic": 6.069739873163224,
+     "statistic": 6.309010540645419,
      "p_value": 0.005,
      "p_holm": 0.02,
      "reject": true,
      "direction": "above",
-     "surrogate_median": -0.12237180397848607,
-     "surrogate_q025": -1.9328624004431674,
-     "surrogate_q975": 2.042111182095657
+     "surrogate_median": 0.008092673803797613,
+     "surrogate_q025": -1.568937630248076,
+     "surrogate_q975": 1.5043281062655665
     },
     {
      "id": "bds_resid",
      "name": "BDS, GARCH residuals",
-     "statistic": 1.9010841632895377,
-     "p_value": 0.055,
-     "p_holm": 0.165,
+     "statistic": 1.833150386925989,
+     "p_value": 0.07,
+     "p_holm": 0.21000000000000002,
      "reject": false,
      "direction": "above",
-     "surrogate_median": 0.07122594393171679,
-     "surrogate_q025": -1.8866081128778756,
-     "surrogate_q975": 1.7402017594737096
+     "surrogate_median": 0.0015302502415503183,
+     "surrogate_q025": -1.8177614419046906,
+     "surrogate_q975": 1.9123522151086974
     },
     {
      "id": "lyap_raw",
      "name": "Lyapunov, raw returns",
-     "statistic": 0.10075846463684576,
-     "p_value": 0.7,
+     "statistic": 0.10088186779832212,
+     "p_value": 0.765,
      "p_holm": 1.0,
      "reject": false,
      "direction": "above",
-     "surrogate_median": 0.10027893052878217,
-     "surrogate_q025": 0.09811871305915582,
-     "surrogate_q975": 0.10293294826807668
+     "surrogate_median": 0.10043821515638722,
+     "surrogate_q025": 0.09770165160459174,
+     "surrogate_q975": 0.10317991912529585
     },
     {
      "id": "lyap_resid",
      "name": "Lyapunov, GARCH residuals",
-     "statistic": 0.10027797919465982,
-     "p_value": 0.905,
+     "statistic": 0.10032241634874746,
+     "p_value": 0.7,
      "p_holm": 1.0,
      "reject": false,
      "direction": "above",
-     "surrogate_median": 0.10009108510968341,
-     "surrogate_q025": 0.09768654552042962,
-     "surrogate_q975": 0.1030005046080959
+     "surrogate_median": 0.09982962632136594,
+     "surrogate_q025": 0.09717435102694472,
+     "surrogate_q975": 0.103060769817497
     }
    ],
-   "seconds": 39.0
+   "seconds": 72.7
   },
   {
    "asset_class": "Crypto",
    "name": "Ethereum",
    "ticker": "ETH-USD",
    "note": "trades seven days a week",
-   "start": "2022-09-11",
-   "end": "2026-10-19",
+   "start": "2022-09-15",
+   "end": "2026-10-23",
    "n_obs": 1500,
    "zero_return_share": 0.0,
    "params": {
@@ -695,12 +695,12 @@
     "m": 4
    },
    "garch": {
-    "mu": 0.00016743242996853185,
-    "omega": 0.0002662483961838827,
-    "alpha": 0.20848529087687062,
-    "beta": 0.6538768628835329,
-    "nu": 2.99186117374873,
-    "persistence": 0.8623621537604035
+    "mu": 0.00014656949610775087,
+    "omega": 0.0002550381223378368,
+    "alpha": 0.19806294591537169,
+    "beta": 0.6628294995989884,
+    "nu": 3.0179398767571746,
+    "persistence": 0.8608924455143601
    },
    "overall": "Nonlinear dependence is present in the raw series but disappears after GARCH(1,1) filtering: the structure is volatility clustering, not predictable dynamics in the mean.",
    "overall_reject": true,
@@ -708,61 +708,61 @@
     {
      "id": "bds_raw",
      "name": "BDS, raw returns",
-     "statistic": 5.427403198421958,
+     "statistic": 5.258742987532544,
      "p_value": 0.005,
      "p_holm": 0.02,
      "reject": true,
      "direction": "above",
-     "surrogate_median": -0.19327894257002776,
-     "surrogate_q025": -1.4433140542612226,
-     "surrogate_q975": 1.9924760219090492
+     "surrogate_median": -0.07134275809554308,
+     "surrogate_q025": -1.6588691685676071,
+     "surrogate_q975": 1.84615098224991
     },
     {
      "id": "bds_resid",
      "name": "BDS, GARCH residuals",
-     "statistic": -0.44025108089120535,
-     "p_value": 0.62,
+     "statistic": -0.4337211545496965,
+     "p_value": 0.755,
      "p_holm": 1.0,
      "reject": false,
      "direction": "below",
-     "surrogate_median": 0.08469783527260037,
-     "surrogate_q025": -1.7097053875069375,
-     "surrogate_q975": 1.8161660875909862
+     "surrogate_median": -0.16205502259205426,
+     "surrogate_q025": -1.8022529969389918,
+     "surrogate_q975": 1.5120471693575757
     },
     {
      "id": "lyap_raw",
      "name": "Lyapunov, raw returns",
-     "statistic": 0.08697661574228434,
-     "p_value": 0.61,
+     "statistic": 0.08722502570524208,
+     "p_value": 0.585,
      "p_holm": 1.0,
      "reject": false,
      "direction": "below",
-     "surrogate_median": 0.08771118085851975,
-     "surrogate_q025": 0.08549182024369895,
-     "surrogate_q975": 0.0900792669428229
+     "surrogate_median": 0.08782430809581526,
+     "surrogate_q025": 0.08578632502414582,
+     "surrogate_q975": 0.09040452430463107
     },
     {
      "id": "lyap_resid",
      "name": "Lyapunov, GARCH residuals",
-     "statistic": 0.08636240457688571,
-     "p_value": 0.315,
-     "p_holm": 0.9450000000000001,
+     "statistic": 0.08630398320354256,
+     "p_value": 0.255,
+     "p_holm": 0.765,
      "reject": false,
      "direction": "below",
-     "surrogate_median": 0.08762479313860196,
-     "surrogate_q025": 0.08572117111684412,
-     "surrogate_q975": 0.09016269766977726
+     "surrogate_median": 0.08763910345271085,
+     "surrogate_q025": 0.0855408932484082,
+     "surrogate_q975": 0.0901954553156764
     }
    ],
-   "seconds": 39.4
+   "seconds": 74.1
   },
   {
    "asset_class": "Commodities and rates",
    "name": "Gold",
    "ticker": "GC=F",
    "note": "front-month future",
-   "start": "2020-11-02",
-   "end": "2026-10-19",
+   "start": "2020-11-06",
+   "end": "2026-10-23",
    "n_obs": 1500,
    "zero_return_share": 0.004,
    "params": {
@@ -770,12 +770,12 @@
     "m": 4
    },
    "garch": {
-    "mu": 0.0002564062330564059,
-    "omega": 1.8706428173654713e-06,
-    "alpha": 0.039122400149378775,
-    "beta": 0.9483615581409787,
-    "nu": 4.489885685505412,
-    "persistence": 0.9874839582903574
+    "mu": 0.0002747137106716063,
+    "omega": 1.805720437978506e-06,
+    "alpha": 0.038702266770840134,
+    "beta": 0.9494962241406781,
+    "nu": 4.464720190866603,
+    "persistence": 0.9881984909115182
    },
    "overall": "Nonlinear dependence is present in the raw series but disappears after GARCH(1,1) filtering: the structure is volatility clustering, not predictable dynamics in the mean.",
    "overall_reject": true,
@@ -783,61 +783,61 @@
     {
      "id": "bds_raw",
      "name": "BDS, raw returns",
-     "statistic": 5.271309404500363,
+     "statistic": 5.2832620021334025,
      "p_value": 0.005,
      "p_holm": 0.02,
      "reject": true,
      "direction": "above",
-     "surrogate_median": 0.03851775300313194,
-     "surrogate_q025": -1.7855755837475353,
-     "surrogate_q975": 1.860363873671647
+     "surrogate_median": 0.12400140944277024,
+     "surrogate_q025": -1.7707561992612475,
+     "surrogate_q975": 2.032522803732317
     },
     {
      "id": "bds_resid",
      "name": "BDS, GARCH residuals",
-     "statistic": -0.04330049089902806,
-     "p_value": 1.0,
+     "statistic": -0.0002998902206226839,
+     "p_value": 0.99,
      "p_holm": 1.0,
      "reject": false,
-     "direction": "below",
-     "surrogate_median": 0.008943135602198934,
-     "surrogate_q025": -1.7831794246321522,
-     "surrogate_q975": 1.5227437435759559
+     "direction": "above",
+     "surrogate_median": -0.0036858677842384682,
+     "surrogate_q025": -1.9269706635138382,
+     "surrogate_q975": 1.639082367410699
     },
     {
      "id": "lyap_raw",
      "name": "Lyapunov, raw returns",
-     "statistic": 0.10089159658970812,
-     "p_value": 0.33,
-     "p_holm": 0.99,
+     "statistic": 0.10112313068468558,
+     "p_value": 0.395,
+     "p_holm": 1.0,
      "reject": false,
      "direction": "above",
-     "surrogate_median": 0.09965767385685674,
-     "surrogate_q025": 0.09731083017123159,
-     "surrogate_q975": 0.10182290290536966
+     "surrogate_median": 0.09976799089395984,
+     "surrogate_q025": 0.09686259722123472,
+     "surrogate_q975": 0.10231251965218768
     },
     {
      "id": "lyap_resid",
      "name": "Lyapunov, GARCH residuals",
-     "statistic": 0.09969162085037978,
-     "p_value": 0.86,
+     "statistic": 0.10011846812255155,
+     "p_value": 0.725,
      "p_holm": 1.0,
      "reject": false,
      "direction": "above",
-     "surrogate_median": 0.09935051933122897,
-     "surrogate_q025": 0.09739691544210709,
-     "surrogate_q975": 0.10193626927592717
+     "surrogate_median": 0.0997052988934082,
+     "surrogate_q025": 0.09678314317336642,
+     "surrogate_q975": 0.10211967981551459
     }
    ],
-   "seconds": 39.0
+   "seconds": 72.2
   },
   {
    "asset_class": "Commodities and rates",
    "name": "Brent crude",
    "ticker": "BZ=F",
    "note": "front-month future; WTI excluded (negative price in April 2020)",
-   "start": "2020-11-02",
-   "end": "2026-10-19",
+   "start": "2020-11-06",
+   "end": "2026-10-23",
    "n_obs": 1500,
    "zero_return_share": 0.0033333333333333335,
    "params": {
@@ -845,12 +845,12 @@
     "m": 4
    },
    "garch": {
-    "mu": 0.000670873124886561,
-    "omega": 1.3604436108560684e-05,
-    "alpha": 0.09648242749609358,
-    "beta": 0.881206067638557,
-    "nu": 6.288881719652922,
-    "persistence": 0.9776884951346506
+    "mu": 0.0006860379517142718,
+    "omega": 1.3482113300749258e-05,
+    "alpha": 0.09562071421267541,
+    "beta": 0.8825160740321955,
+    "nu": 6.239889717648308,
+    "persistence": 0.9781367882448708
    },
    "overall": "Nonlinear dependence is present in the raw series but disappears after GARCH(1,1) filtering: the structure is volatility clustering, not predictable dynamics in the mean.",
    "overall_reject": true,
@@ -858,61 +858,61 @@
     {
      "id": "bds_raw",
      "name": "BDS, raw returns",
-     "statistic": 10.877602649177307,
+     "statistic": 10.795002201368728,
      "p_value": 0.005,
      "p_holm": 0.02,
      "reject": true,
      "direction": "above",
-     "surrogate_median": -0.03856848904992326,
-     "surrogate_q025": -1.6009877670812889,
-     "surrogate_q975": 1.7843269546226606
+     "surrogate_median": -0.016832045934963097,
+     "surrogate_q025": -1.8247737500970214,
+     "surrogate_q975": 1.8756909378185114
     },
     {
      "id": "bds_resid",
      "name": "BDS, GARCH residuals",
-     "statistic": -0.24863371617383873,
-     "p_value": 0.79,
-     "p_holm": 1.0,
+     "statistic": -0.23547593073530326,
+     "p_value": 0.84,
+     "p_holm": 0.85,
      "reject": false,
      "direction": "below",
-     "surrogate_median": 0.03350970512744805,
-     "surrogate_q025": -1.6396292945330988,
-     "surrogate_q975": 1.9064023215420058
+     "surrogate_median": -0.07154246835350059,
+     "surrogate_q025": -1.7486127436845529,
+     "surrogate_q975": 1.773349442095006
     },
     {
      "id": "lyap_raw",
      "name": "Lyapunov, raw returns",
-     "statistic": 0.1258496469004563,
-     "p_value": 0.065,
-     "p_holm": 0.195,
+     "statistic": 0.12597094852041826,
+     "p_value": 0.115,
+     "p_holm": 0.34500000000000003,
      "reject": false,
      "direction": "below",
-     "surrogate_median": 0.12884049788577567,
-     "surrogate_q025": 0.1263047616725101,
-     "surrogate_q975": 0.1321521114517108
+     "surrogate_median": 0.12873871114740104,
+     "surrogate_q025": 0.12524053719765207,
+     "surrogate_q975": 0.13185363125976468
     },
     {
      "id": "lyap_resid",
      "name": "Lyapunov, GARCH residuals",
-     "statistic": 0.12890675851145278,
-     "p_value": 0.715,
-     "p_holm": 1.0,
+     "statistic": 0.12930697435316962,
+     "p_value": 0.425,
+     "p_holm": 0.85,
      "reject": false,
      "direction": "above",
-     "surrogate_median": 0.12829626883808126,
-     "surrogate_q025": 0.12513571888064526,
-     "surrogate_q975": 0.1311506394907234
+     "surrogate_median": 0.12826400035782415,
+     "surrogate_q025": 0.1255555564197712,
+     "surrogate_q975": 0.13163205690771457
     }
    ],
-   "seconds": 38.8
+   "seconds": 71.4
   },
   {
    "asset_class": "Commodities and rates",
    "name": "US 10-year Treasury",
    "ticker": "ZN=F",
    "note": "front-month T-note future",
-   "start": "2020-11-02",
-   "end": "2026-10-19",
+   "start": "2020-11-06",
+   "end": "2026-10-23",
    "n_obs": 1500,
    "zero_return_share": 0.014666666666666666,
    "params": {
@@ -920,12 +920,12 @@
     "m": 4
    },
    "garch": {
-    "mu": 9.96844897883124e-06,
-    "omega": 6.934982131365844e-08,
-    "alpha": 0.04352838352670929,
-    "beta": 0.9527515583668387,
-    "nu": 10.372379207773662,
-    "persistence": 0.996279941893548
+    "mu": 5.7402814670849054e-06,
+    "omega": 7.201481401307983e-08,
+    "alpha": 0.0440238229019623,
+    "beta": 0.9526249536099132,
+    "nu": 9.56200051503653,
+    "persistence": 0.9966487765118754
    },
    "overall": "Nonlinear dependence is present in the raw series but disappears after GARCH(1,1) filtering: the structure is volatility clustering, not predictable dynamics in the mean.",
    "overall_reject": true,
@@ -933,61 +933,61 @@
     {
      "id": "bds_raw",
      "name": "BDS, raw returns",
-     "statistic": 7.103796180753337,
+     "statistic": 7.122357322862504,
      "p_value": 0.005,
      "p_holm": 0.02,
      "reject": true,
      "direction": "above",
-     "surrogate_median": 0.16630357249135677,
-     "surrogate_q025": -1.3837996830808497,
-     "surrogate_q975": 2.0629287502435334
+     "surrogate_median": 0.044484536363784924,
+     "surrogate_q025": -1.7368950985351108,
+     "surrogate_q975": 2.203717110741639
     },
     {
      "id": "bds_resid",
      "name": "BDS, GARCH residuals",
-     "statistic": -0.5515507959744286,
-     "p_value": 0.555,
+     "statistic": -0.4731527374762011,
+     "p_value": 0.56,
      "p_holm": 1.0,
      "reject": false,
      "direction": "below",
-     "surrogate_median": 0.006019885764551786,
-     "surrogate_q025": -1.5778993983299674,
-     "surrogate_q975": 1.8023990108998067
+     "surrogate_median": -0.000728313750543946,
+     "surrogate_q025": -1.840938215487463,
+     "surrogate_q975": 1.7670040668657176
     },
     {
      "id": "lyap_raw",
      "name": "Lyapunov, raw returns",
-     "statistic": 0.09848965748335592,
-     "p_value": 0.61,
+     "statistic": 0.09864311203789522,
+     "p_value": 0.575,
      "p_holm": 1.0,
      "reject": false,
      "direction": "below",
-     "surrogate_median": 0.0991957107575047,
-     "surrogate_q025": 0.09650686467762223,
-     "surrogate_q975": 0.10182016292817876
+     "surrogate_median": 0.09935650128118038,
+     "surrogate_q025": 0.0969541672977513,
+     "surrogate_q975": 0.10181133869743766
     },
     {
      "id": "lyap_resid",
      "name": "Lyapunov, GARCH residuals",
-     "statistic": 0.10046590887542736,
-     "p_value": 0.24,
-     "p_holm": 0.72,
+     "statistic": 0.10055202829305765,
+     "p_value": 0.315,
+     "p_holm": 0.9450000000000001,
      "reject": false,
      "direction": "above",
-     "surrogate_median": 0.09901177125554038,
-     "surrogate_q025": 0.09696181803972193,
-     "surrogate_q975": 0.10157572609109781
+     "surrogate_median": 0.0993618281102801,
+     "surrogate_q025": 0.09686530732458169,
+     "surrogate_q975": 0.10174889150983868
     }
    ],
-   "seconds": 27.4
+   "seconds": 49.6
   },
   {
    "asset_class": "Private markets",
    "name": "Listed private equity",
    "ticker": "PSP",
    "note": "Invesco Global Listed Private Equity ETF; a daily proxy, since private fund returns are quarterly and appraisal-smoothed",
-   "start": "2020-10-28",
-   "end": "2026-10-19",
+   "start": "2020-11-03",
+   "end": "2026-10-23",
    "n_obs": 1500,
    "zero_return_share": 0.014,
    "params": {
@@ -995,12 +995,12 @@
     "m": 4
    },
    "garch": {
-    "mu": 0.000510493113807404,
-    "omega": 5.623821706275587e-06,
-    "alpha": 0.07206630966001158,
-    "beta": 0.900110058156824,
-    "nu": 7.69725714111114,
-    "persistence": 0.9721763678168356
+    "mu": 0.0005105952263498195,
+    "omega": 5.6589648582262355e-06,
+    "alpha": 0.07212395425041902,
+    "beta": 0.899897673235308,
+    "nu": 7.733084742323372,
+    "persistence": 0.9720216274857271
    },
    "overall": "Nonlinear dependence is present in the raw series but disappears after GARCH(1,1) filtering: the structure is volatility clustering, not predictable dynamics in the mean.",
    "overall_reject": true,
@@ -1008,53 +1008,53 @@
     {
      "id": "bds_raw",
      "name": "BDS, raw returns",
-     "statistic": 7.531041257161123,
+     "statistic": 7.46863849097554,
      "p_value": 0.005,
      "p_holm": 0.02,
      "reject": true,
      "direction": "above",
-     "surrogate_median": -0.005830636321656216,
-     "surrogate_q025": -1.8676971655881733,
-     "surrogate_q975": 2.1785062495384917
+     "surrogate_median": -0.02816135633323852,
+     "surrogate_q025": -1.7043675596570476,
+     "surrogate_q975": 1.8477359643798255
     },
     {
      "id": "bds_resid",
      "name": "BDS, GARCH residuals",
-     "statistic": -0.13390846181424929,
-     "p_value": 0.885,
+     "statistic": -0.2270737765219094,
+     "p_value": 0.98,
      "p_holm": 1.0,
      "reject": false,
      "direction": "below",
-     "surrogate_median": 0.003277988550786169,
-     "surrogate_q025": -1.9515325544535558,
-     "surrogate_q975": 2.045988649412142
+     "surrogate_median": -0.2076773058800505,
+     "surrogate_q025": -1.5475978805766772,
+     "surrogate_q975": 1.9008366205177467
     },
     {
      "id": "lyap_raw",
      "name": "Lyapunov, raw returns",
-     "statistic": 0.09868279784237044,
-     "p_value": 0.62,
+     "statistic": 0.09906361261708262,
+     "p_value": 1.0,
      "p_holm": 1.0,
      "reject": false,
-     "direction": "below",
-     "surrogate_median": 0.09919579090545491,
-     "surrogate_q025": 0.09697478604115213,
-     "surrogate_q975": 0.10186652010745245
+     "direction": "above",
+     "surrogate_median": 0.09905675649952628,
+     "surrogate_q025": 0.09574100178331635,
+     "surrogate_q975": 0.10149150948043018
     },
     {
      "id": "lyap_resid",
      "name": "Lyapunov, GARCH residuals",
-     "statistic": 0.09921982016604834,
-     "p_value": 0.87,
+     "statistic": 0.09970722056267488,
+     "p_value": 0.84,
      "p_holm": 1.0,
      "reject": false,
      "direction": "above",
-     "surrogate_median": 0.09897657975480283,
-     "surrogate_q025": 0.09651367543692628,
-     "surrogate_q975": 0.10164861398436428
+     "surrogate_median": 0.09938077199884043,
+     "surrogate_q025": 0.097078332044959,
+     "surrogate_q975": 0.10162674776922549
     }
    ],
-   "seconds": 27.3
+   "seconds": 49.8
   }
  ]
 }
